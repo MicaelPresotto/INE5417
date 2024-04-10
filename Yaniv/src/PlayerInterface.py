@@ -21,11 +21,11 @@ class PlayerInterface:
         w.imagem = imagem
         w.place(relx=0.3, rely=0.4)
         
-        cardsPlayer1 = ['2C', '3C', '4C', '5C', '6C']
+        myCards = ['2C', '3C', '4C', '5C', '6C']
 
         # bottom
-        for i in range(len(cardsPlayer1)):
-            imagem = Image.open(f"/home/bridge/Documentos/INE5417/Yaniv/cards/{cardsPlayer1[i]}.png")
+        for i in range(len(myCards)):
+            imagem = Image.open(f"/home/bridge/Documentos/INE5417/Yaniv/cards/{myCards[i]}.png")
             imagem = ImageTk.PhotoImage(imagem)
             w = tk.Label(self.window, image=imagem, bd=0, bg="darkgreen")
             w.imagem = imagem
@@ -33,7 +33,7 @@ class PlayerInterface:
 
         # left
         for i in range(5):
-            imagem = Image.open(f"/home/bridge/Documentos/INE5417/Yaniv/cards/backLeft.png")
+            imagem = Image.open("/home/bridge/Documentos/INE5417/Yaniv/cards/backLeft.png")
             imagem = ImageTk.PhotoImage(imagem)
             w = tk.Label(self.window, image=imagem, bd=0, bg="darkgreen")
             w.imagem = imagem
@@ -41,7 +41,7 @@ class PlayerInterface:
 
         # right
         for i in range(5):
-            imagem = Image.open(f"/home/bridge/Documentos/INE5417/Yaniv/cards/backRight.png")
+            imagem = Image.open("/home/bridge/Documentos/INE5417/Yaniv/cards/backRight.png")
             imagem = ImageTk.PhotoImage(imagem)
             w = tk.Label(self.window, image=imagem, bd=0, bg="darkgreen")
             w.imagem = imagem
@@ -49,7 +49,7 @@ class PlayerInterface:
 
         # top
         for i in range(5):
-            imagem = Image.open(f"/home/bridge/Documentos/INE5417/Yaniv/cards/backUpsideDown.png")
+            imagem = Image.open("/home/bridge/Documentos/INE5417/Yaniv/cards/backUpsideDown.png")
             imagem = ImageTk.PhotoImage(imagem)
             w = tk.Label(self.window, image=imagem, bd=0, bg="darkgreen")
             w.imagem = imagem
