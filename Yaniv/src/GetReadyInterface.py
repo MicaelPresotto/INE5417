@@ -2,13 +2,13 @@ import tkinter as tk
 import sys
 from PlayerInterface import PlayerInterface
 
-class YanivInterface:
+class GetReadyInterface:
     def __init__(self, window):
         self.window = window
         self.window.title("Main menu")
         self.window.geometry("800x600")
         self.window.config(bg="purple")
-        self.window.resizable(width=True, height=True)
+        self.window.resizable(width=False, height=False)
         self.create_widgets()
 
     def create_widgets(self):
@@ -20,7 +20,7 @@ class YanivInterface:
         self.labelYaniv = tk.Label(self.window, text="Yaniv", bg="purple", fg="white", font=("Arial", 24))
         self.labelPlayers = tk.Label(self.window, text="Players: 1/4", bg="purple", fg="white", font=("Arial", 24))
         self.labelYaniv.place(relx=0.45, rely=0.1)
-        self.labelPlayers.place(relx=0.45, rely=0.3)
+        self.labelPlayers.place(relx=0.40, rely=0.3)
 
     def open_player_interface(self):
         self.window.destroy()
@@ -30,5 +30,5 @@ class YanivInterface:
         
         
 window = tk.Tk()
-app = YanivInterface(window)
+app = GetReadyInterface(window)
 window.mainloop()
