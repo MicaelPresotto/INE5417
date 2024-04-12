@@ -12,14 +12,14 @@ class PlayerInterface:
         self.create_widgets()
 
     def create_widgets(self):
-        self.buttonTake = tk.Button(self.window, text="Take", command=self.onClickTake)
         self.buttonDiscard = tk.Button(self.window, text="Discard", command=self.onClickDiscard)
-        self.buttonTake.place(relx=0.6, rely=0.6, relwidth=0.08, relheight=0.08)
-        self.buttonDiscard.place(relx=0.3, rely=0.6, relwidth=0.09, relheight=0.08)
+        self.buttonBuy = tk.Button(self.window, text="Buy", command=self.onClickBuy)
+        self.buttonDiscard.place(relx=0.6, rely=0.6, relwidth=0.08, relheight=0.08)
+        self.buttonBuy.place(relx=0.3, rely=0.6, relwidth=0.09, relheight=0.08)
 
-        imagem = tk.PhotoImage(file="/home/bridge/Documentos/INE5417/Yaniv/cards/back.png")
-        w = tk.Label(self.window, image=imagem, bd=0, bg="darkgreen")
-        w.imagem = imagem
+        imageBuyMount = tk.PhotoImage(file="/home/bridge/Documentos/INE5417/Yaniv/cards/back.png")
+        w = tk.Label(self.window, image=imageBuyMount, bd=0, bg="darkgreen")
+        w.imagem = imageBuyMount
         w.place(relx=0.3, rely=0.4)
         
         myCards = ['2C', '3C', '4C', '5C', '6C']
@@ -86,11 +86,11 @@ class PlayerInterface:
         self.labelPontuacaoPlayer4 = tk.Label(framePlayer4, text="Pontuação: 0", bg="white", font=("Arial", 8))
         self.labelPontuacaoPlayer4.place(relx=0.25, rely=0.5)
 
+    def onClickBuy(self):
+        messagebox.showinfo("Buy", "Buy clicked")
+
     def onClickDiscard(self):
         messagebox.showinfo("Discard", "Discard clicked")
-
-    def onClickTake(self):
-        messagebox.showinfo("Take", "Take clicked")
 
     def onclickCard(self, card):
         messagebox.showinfo("Card", f"Card {card} clicked")
