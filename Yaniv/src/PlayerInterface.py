@@ -38,35 +38,35 @@ class PlayerInterface:
 
         # bottom
         for i in range(len(myCards)):
-            imagem = Image.open(f"cards/{myCards[i]}.png")
-            imagem = ImageTk.PhotoImage(imagem)
-            w = tk.Label(self.mainWindow, image=imagem, bd=0, bg="darkgreen")
+            cardImage = Image.open(f"cards/{myCards[i]}.png")
+            cardImage = ImageTk.PhotoImage(cardImage)
+            w = tk.Label(self.mainWindow, image=cardImage, bd=0, bg="darkgreen")
             w.bind("<Button-1>", lambda event, idx=i: self.onClickCard(myCards[idx]))
-            w.imagem = imagem
+            w.image = cardImage
             w.place(relx=0.3 + i * 0.07, rely=0.8)
 
         # left
         for i in range(5):
-            imagem = Image.open("cards/backLeft.png")
-            imagem = ImageTk.PhotoImage(imagem)
-            w = tk.Label(self.mainWindow, image=imagem, bd=0, bg="darkgreen")
-            w.imagem = imagem
+            cardImage = Image.open("cards/backLeft.png")
+            cardImage = ImageTk.PhotoImage(cardImage)
+            w = tk.Label(self.mainWindow, image=cardImage, bd=0, bg="darkgreen")
+            w.image = cardImage
             w.place(relx=0.02, rely=0.3 + i * 0.07)
 
         # right
         for i in range(5):
-            imagem = Image.open("cards/backRight.png")
-            imagem = ImageTk.PhotoImage(imagem)
-            w = tk.Label(self.mainWindow, image=imagem, bd=0, bg="darkgreen")
-            w.imagem = imagem
+            cardImage = Image.open("cards/backRight.png")
+            cardImage = ImageTk.PhotoImage(cardImage)
+            w = tk.Label(self.mainWindow, image=cardImage, bd=0, bg="darkgreen")
+            w.image = cardImage
             w.place(relx=0.85, rely=0.3 + i * 0.07)
 
         # top
         for i in range(5):
-            imagem = Image.open("cards/backUpsideDown.png")
-            imagem = ImageTk.PhotoImage(imagem)
-            w = tk.Label(self.mainWindow, image=imagem, bd=0, bg="darkgreen")
-            w.imagem = imagem
+            cardImage = Image.open("cards/backUpsideDown.png")
+            cardImage = ImageTk.PhotoImage(cardImage)
+            w = tk.Label(self.mainWindow, image=cardImage, bd=0, bg="darkgreen")
+            w.image = cardImage
             w.place(relx=0.3 + i * 0.07, rely=0.02)
 
         framePlayer1 = tk.Frame(self.mainWindow, bg="white", bd=1, borderwidth=2, highlightbackground="black", highlightcolor="black", highlightthickness=1)
