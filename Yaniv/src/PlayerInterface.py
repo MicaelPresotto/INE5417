@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
 
+
 class PlayerInterface:
     def __init__(self, mainWindow):
         self.mainWindow = mainWindow
@@ -13,14 +14,32 @@ class PlayerInterface:
         self.createMenu()
 
     def create_widgets(self):
-        self.buyLabel = tk.Label(self.mainWindow, text="Buy mount", bg="darkgreen", font=("Arial", 15), fg="white")
-        self.discardLabel = tk.Label(self.mainWindow, text="Discard mount", bg="darkgreen", font=("Arial", 15), fg="white")
+        self.buyLabel = tk.Label(
+            self.mainWindow,
+            text="Buy mount",
+            bg="darkgreen",
+            font=("Arial", 15),
+            fg="white",
+        )
+        self.discardLabel = tk.Label(
+            self.mainWindow,
+            text="Discard mount",
+            bg="darkgreen",
+            font=("Arial", 15),
+            fg="white",
+        )
         self.buyLabel.place(relx=0.29, rely=0.34)
         self.discardLabel.place(relx=0.55, rely=0.34)
 
-        self.discardButton = tk.Button(self.mainWindow, text="Discard", command=self.onClickDiscard, width=10, height=2, bg="white")
+        self.discardButton = tk.Button(
+            self.mainWindow,
+            text="Discard",
+            command=self.onClickDiscard,
+            width=10,
+            height=2,
+            bg="white",
+        )
         self.discardButton.place(relx=0.44, rely=0.6)
-
 
         imageBuyMount = tk.PhotoImage(file="cards/back.png")
         buyMount = tk.Label(self.mainWindow, image=imageBuyMount, bd=0, bg="darkgreen")
@@ -29,12 +48,14 @@ class PlayerInterface:
         buyMount.bind("<Button-1>", lambda event: self.onClickBuy())
 
         imageDiscardMount = tk.PhotoImage(file="cards/7C.png")
-        discardMount = tk.Label(self.mainWindow, image=imageDiscardMount, bd=0, bg="darkgreen")
+        discardMount = tk.Label(
+            self.mainWindow, image=imageDiscardMount, bd=0, bg="darkgreen"
+        )
         discardMount.imagem = imageDiscardMount
         discardMount.place(relx=0.58, rely=0.4)
         discardMount.bind("<Button-1>", lambda event: self.onClickDiscardMount())
-        
-        myCards = ['2C', '3C', '4C', '5C', '6C']
+
+        myCards = ["2C", "3C", "4C", "5C", "6C"]
 
         # bottom
         for i in range(len(myCards)):
@@ -69,40 +90,86 @@ class PlayerInterface:
             w.image = cardImage
             w.place(relx=0.3 + i * 0.07, rely=0.02)
 
-        framePlayer1 = tk.Frame(self.mainWindow, bg="white", bd=1, borderwidth=2, highlightbackground="black", highlightcolor="black", highlightthickness=1)
+        framePlayer1 = tk.Frame(
+            self.mainWindow,
+            bg="white",
+            bd=1,
+            borderwidth=2,
+            highlightbackground="black",
+            highlightcolor="black",
+            highlightthickness=1,
+        )
         framePlayer1.place(relx=0.7, rely=0.9, relwidth=0.15, relheight=0.07)
-        self.labelPlayer1 = tk.Label(framePlayer1, text="Player 1", bg="white", font=("Arial", 8))
+        self.labelPlayer1 = tk.Label(
+            framePlayer1, text="Player 1", bg="white", font=("Arial", 8)
+        )
         self.labelPlayer1.place(relx=0.33, rely=0.01)
-        self.labelPontuacaoPlayer1 = tk.Label(framePlayer1, text="Pontuação: 0", bg="white", font=("Arial", 8))
+        self.labelPontuacaoPlayer1 = tk.Label(
+            framePlayer1, text="Pontuação: 0", bg="white", font=("Arial", 8)
+        )
         self.labelPontuacaoPlayer1.place(relx=0.22, rely=0.5)
 
-        framePlayer2 = tk.Frame(self.mainWindow, bg="white", bd=1, borderwidth=2, highlightbackground="black", highlightcolor="black", highlightthickness=1)
+        framePlayer2 = tk.Frame(
+            self.mainWindow,
+            bg="white",
+            bd=1,
+            borderwidth=2,
+            highlightbackground="black",
+            highlightcolor="black",
+            highlightthickness=1,
+        )
         framePlayer2.place(relx=0.12, rely=0.05, relwidth=0.15, relheight=0.07)
-        self.labelPlayer2 = tk.Label(framePlayer2, text="Player 3", bg="white", font=("Arial", 8))
+        self.labelPlayer2 = tk.Label(
+            framePlayer2, text="Player 3", bg="white", font=("Arial", 8)
+        )
         self.labelPlayer2.place(relx=0.33, rely=0.01)
-        self.labelPontuacaoPlayer2 = tk.Label(framePlayer2, text="Pontuação: 0", bg="white", font=("Arial", 8))
+        self.labelPontuacaoPlayer2 = tk.Label(
+            framePlayer2, text="Pontuação: 0", bg="white", font=("Arial", 8)
+        )
         self.labelPontuacaoPlayer2.place(relx=0.22, rely=0.5)
 
-        framePlayer3 = tk.Frame(self.mainWindow, bg="white", bd=1, borderwidth=2, highlightbackground="black", highlightcolor="black", highlightthickness=1)
+        framePlayer3 = tk.Frame(
+            self.mainWindow,
+            bg="white",
+            bd=1,
+            borderwidth=2,
+            highlightbackground="black",
+            highlightcolor="black",
+            highlightthickness=1,
+        )
         framePlayer3.place(relx=0.02, rely=0.72, relwidth=0.15, relheight=0.07)
-        self.labelPlayer3 = tk.Label(framePlayer3, text="Player 4", bg="white", font=("Arial", 8))
+        self.labelPlayer3 = tk.Label(
+            framePlayer3, text="Player 4", bg="white", font=("Arial", 8)
+        )
         self.labelPlayer3.place(relx=0.33, rely=0.01)
-        self.labelPontuacaoPlayer3 = tk.Label(framePlayer3, text="Pontuação: 0", bg="white", font=("Arial", 8))
+        self.labelPontuacaoPlayer3 = tk.Label(
+            framePlayer3, text="Pontuação: 0", bg="white", font=("Arial", 8)
+        )
         self.labelPontuacaoPlayer3.place(relx=0.22, rely=0.5)
 
-
-        framePlayer4 = tk.Frame(self.mainWindow, bg="white", bd=1, borderwidth=2, highlightbackground="black", highlightcolor="black", highlightthickness=1)
+        framePlayer4 = tk.Frame(
+            self.mainWindow,
+            bg="white",
+            bd=1,
+            borderwidth=2,
+            highlightbackground="black",
+            highlightcolor="black",
+            highlightthickness=1,
+        )
         framePlayer4.place(relx=0.84, rely=0.2, relwidth=0.15, relheight=0.07)
-        self.labelPlayer4 = tk.Label(framePlayer4, text="Player 2", bg="white", font=("Arial", 8))
+        self.labelPlayer4 = tk.Label(
+            framePlayer4, text="Player 2", bg="white", font=("Arial", 8)
+        )
         self.labelPlayer4.place(relx=0.33, rely=0.01)
-        self.labelPontuacaoPlayer4 = tk.Label(framePlayer4, text="Pontuação: 0", bg="white", font=("Arial", 8))
+        self.labelPontuacaoPlayer4 = tk.Label(
+            framePlayer4, text="Pontuação: 0", bg="white", font=("Arial", 8)
+        )
         self.labelPontuacaoPlayer4.place(relx=0.22, rely=0.5)
-
 
     def createMenu(self):
         self.menu = tk.Menu(self.mainWindow)
-        self.menu.option_add('*tearOff', False)
-        self.mainWindow['menu'] = self.menu
+        self.menu.option_add("*tearOff", False)
+        self.mainWindow["menu"] = self.menu
 
         self.menuFile = tk.Menu(self.menu, bg="white", fg="black")
         self.menu.add_cascade(menu=self.menuFile, label="Menu")
@@ -127,7 +194,7 @@ class PlayerInterface:
 
     def onClickTake(self):
         messagebox.showinfo("Take", "Take clicked")
-    
+
     def onClickRules(self):
         messagebox.showinfo("Rules", "Rules clicked")
 
@@ -136,14 +203,16 @@ class PlayerInterface:
 
     def onClickReset(self):
         messagebox.showinfo("Reset", "Reset clicked")
-    
+
     def onClickExit(self):
         messagebox.showinfo("Exit", "Exit clicked")
+
 
 def main():
     root = tk.Tk()
     PlayerInterface(root)
     root.mainloop()
+
 
 if __name__ == "__main__":
     main()
