@@ -16,14 +16,14 @@ class PlayerInterface:
     def create_widgets(self):
         self.buyLabel = tk.Label(
             self.mainWindow,
-            text="Buy mount",
+            text="Buy deck",
             bg="darkgreen",
             font=("Arial", 15),
             fg="white",
         )
         self.discardLabel = tk.Label(
             self.mainWindow,
-            text="Discard mount",
+            text="Discard deck",
             bg="darkgreen",
             font=("Arial", 15),
             fg="white",
@@ -62,19 +62,19 @@ class PlayerInterface:
         )
         self.dontCallYanivButton.place(relx=0.58, rely=0.7)
 
-        imageBuyMount = tk.PhotoImage(file="cards/back.png")
-        buyMount = tk.Label(self.mainWindow, image=imageBuyMount, bd=0, bg="darkgreen")
-        buyMount.imagem = imageBuyMount
-        buyMount.place(relx=0.3, rely=0.4)
-        buyMount.bind("<Button-1>", lambda event: self.onClickBuy())
+        imageBuyDeck= tk.PhotoImage(file="cards/back.png")
+        buyDeck = tk.Label(self.mainWindow, image=imageBuyDeck, bd=0, bg="darkgreen")
+        buyDeck.imagem = imageBuyDeck
+        buyDeck.place(relx=0.3, rely=0.4)
+        buyDeck.bind("<Button-1>", lambda event: self.onClickBuy())
 
-        imageDiscardMount = tk.PhotoImage(file="cards/7C.png")
-        discardMount = tk.Label(
-            self.mainWindow, image=imageDiscardMount, bd=0, bg="darkgreen"
+        imageDiscardDeck= tk.PhotoImage(file="cards/7C.png")
+        discardDeck= tk.Label(
+            self.mainWindow, image=imageDiscardDeck, bd=0, bg="darkgreen"
         )
-        discardMount.imagem = imageDiscardMount
-        discardMount.place(relx=0.58, rely=0.4)
-        discardMount.bind("<Button-1>", lambda event: self.onClickDiscardMount())
+        discardDeck.imagem = imageDiscardDeck
+        discardDeck.place(relx=0.58, rely=0.4)
+        discardDeck.bind("<Button-1>", lambda event: self.onClickDiscardDeck())
 
         self.roundLabel = tk.Label(
             self.mainWindow,
@@ -212,13 +212,13 @@ class PlayerInterface:
         self.menuFile.add_command(label="Exit", command=self.onClickExit)
 
     def onClickBuy(self):
-        messagebox.showinfo("Buy mount", "Buy mount clicked")
+        messagebox.showinfo("Buy Deck", "Buy deck clicked")
 
     def onClickDiscard(self):
         messagebox.showinfo("Discard", "Discard clicked")
 
-    def onClickDiscardMount(self):
-        messagebox.showinfo("Discard mount", "Discard mount clicked")
+    def onClickDiscardDeck(self):
+        messagebox.showinfo("Discard Deck", "Discard deck clicked")
 
     def onClickCard(self, card):
         messagebox.showinfo("Card", f"Card {card} clicked")
