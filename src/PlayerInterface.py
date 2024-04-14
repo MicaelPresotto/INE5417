@@ -76,6 +76,16 @@ class PlayerInterface:
         discardMount.place(relx=0.58, rely=0.4)
         discardMount.bind("<Button-1>", lambda event: self.onClickDiscardMount())
 
+        self.roundLabel = tk.Label(
+            self.mainWindow,
+            text="Round: X",
+            bg="darkgreen",
+            font=("Arial", 15),
+            fg="white",
+        )
+
+        self.roundLabel.place(relx=0.85, rely=0.02)
+
         myCards = ["2C", "3C", "4C", "5C", "6C"]
 
         # bottom
