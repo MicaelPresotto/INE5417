@@ -41,6 +41,27 @@ class PlayerInterface:
         )
         self.discardButton.place(relx=0.44, rely=0.6)
 
+        self.callYanivButton = tk.Button(
+            self.mainWindow,
+            text="Call yaniv",
+            command=self.onClickCallYaniv,
+            width=10,
+            height=2,
+            bg="white",
+        )
+
+        self.callYanivButton.place(relx=0.3, rely=0.7)
+
+        self.dontCallYanivButton = tk.Button(
+            self.mainWindow,
+            text="Don't call yaniv",
+            command=self.onClickDontCallYaniv,
+            width=12,
+            height=2,
+            bg="white",
+        )
+        self.dontCallYanivButton.place(relx=0.58, rely=0.7)
+
         imageBuyMount = tk.PhotoImage(file="cards/back.png")
         buyMount = tk.Label(self.mainWindow, image=imageBuyMount, bd=0, bg="darkgreen")
         buyMount.imagem = imageBuyMount
@@ -206,6 +227,12 @@ class PlayerInterface:
 
     def onClickExit(self):
         messagebox.showinfo("Exit", "Exit clicked")
+
+    def onClickCallYaniv(self):
+        messagebox.showinfo("Call yaniv", "Call yaniv clicked")
+
+    def onClickDontCallYaniv(self):
+        messagebox.showinfo("Call yaniv", "Call yaniv clicked")
 
 
 def main():
