@@ -1,9 +1,10 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, simpledialog
 from PIL import Image, ImageTk
+from dog.dog_actor import DogActor
+from dog.dog_interface import DogPlayerInterface
 
-
-class PlayerInterface:
+class PlayerInterface(DogPlayerInterface):
     def __init__(self, mainWindow):
         self.mainWindow = mainWindow
         self.mainWindow.title("Yaniv")
@@ -12,6 +13,23 @@ class PlayerInterface:
         self.mainWindow.resizable(width=False, height=False)
         self.create_widgets()
         self.createMenu()
+        self.dogActor = DogActor()
+        self.conecting_to_dog_server()
+    
+    def conecting_to_dog_server(self):
+        playerName = simpledialog.askstring("Player name", "Enter your name")
+        msg = self.dogActor.initialize(playerName, self)
+        messagebox.showinfo("Connection", msg)
+        if msg == "Conectado a Dog Server":
+            return
+        exit()
+
+    def receive_start(self, start_status):
+        code = int(start_status.code)
+        if code == 0 or code == 1:
+            messagebox.showinfo("Problema", start_status.message)
+            return
+        messagebox.showinfo("Start", start_status.message)
 
     def create_widgets(self):
         self.buyLabel = tk.Label(
@@ -230,7 +248,12 @@ class PlayerInterface:
         messagebox.showinfo("Rules", "Rules clicked")
 
     def onClickStart(self):
-        messagebox.showinfo("Start", "Start clicked")
+        status = self.dogActor.start_match(4)
+        code = int(status.code)
+        if code == 0 or code == 1:
+            messagebox.showinfo("Problema", status.message)
+            return
+        messagebox.showinfo("Start", status.message)
 
     def onClickReset(self):
         messagebox.showinfo("Reset", "Reset clicked")
