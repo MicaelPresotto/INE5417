@@ -1,1 +1,3 @@
-documentation/Yaniv.vpp.bak*
+documentation/Yaniv.vpp.*
+src/__pycache__
+src/dog/__pycache__

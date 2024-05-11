@@ -5,18 +5,19 @@ from dog.dog_actor import DogActor
 from dog.dog_interface import DogPlayerInterface
 
 class PlayerInterface(DogPlayerInterface):
-    def __init__(self, mainWindow):
-        self.mainWindow = mainWindow
+    def __init__(self):
+        self.mainWindow = tk.Tk()
         self.mainWindow.title("Yaniv")
         self.mainWindow.geometry("800x600")
         self.mainWindow.config(bg="darkgreen")
         self.mainWindow.resizable(width=False, height=False)
-        self.create_widgets()
+        self.createWidgets()
         self.createMenu()
         self.dogActor = DogActor()
         self.conecting_to_dog_server()
+        self.mainWindow.mainloop()
     
-    def conecting_to_dog_server(self):
+    def connectingToDogServer(self):
         playerName = simpledialog.askstring("Player name", "Enter your name")
         msg = self.dogActor.initialize(playerName, self)
         messagebox.showinfo("Connection", msg)
@@ -266,13 +267,3 @@ class PlayerInterface(DogPlayerInterface):
 
     def onClickDontCallYaniv(self):
         messagebox.showinfo("Call yaniv", "Call yaniv clicked")
-
-
-def main():
-    root = tk.Tk()
-    PlayerInterface(root)
-    root.mainloop()
-
-
-if __name__ == "__main__":
-    main()
