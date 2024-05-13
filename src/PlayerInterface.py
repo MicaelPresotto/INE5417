@@ -14,7 +14,7 @@ class PlayerInterface(DogPlayerInterface):
         self.createWidgets()
         self.createMenu()
         self.dogActor = DogActor()
-        self.conecting_to_dog_server()
+        self.connectingToDogServer()
         self.mainWindow.mainloop()
     
     def connectingToDogServer(self):
@@ -32,7 +32,7 @@ class PlayerInterface(DogPlayerInterface):
             return
         messagebox.showinfo("Start", start_status.message)
 
-    def create_widgets(self):
+    def createWidgets(self):
         self.buyLabel = tk.Label(
             self.mainWindow,
             text="Buy deck",
