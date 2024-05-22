@@ -1,8 +1,12 @@
 from Player import Player
+from DiscardDeck import DiscardDeck
+from BuyDeck import BuyDeck
 
 class Table:
     def __init__(self):
-        ...
+        self.players = [Player(f"Player {i}") for i in range(4)]
+        self.discardDeck = DiscardDeck()
+        self.buyDeck = BuyDeck()
 
     def identifyTurnPlayer(self) -> Player:
         ...
@@ -14,10 +18,17 @@ class Table:
         ...
 
     def isSet(self, cards: list) -> bool:
-        ...
+        value = cards[0].get_value()
+        for card in cards[1:]:
+            if card.get_value() != value: return False
+        return True
 
     def isSequence(self, cards: list) -> bool:
-        ...
+        cards.sort(key = lambda c: c.get_value())
+        suit = cards[0].get_suit()
+        for i in range(1, len(cards)):
+            if cards[i].get_suit() != suit or cards[i].get_value() - 1 != cards[i-1].get_value(): return False
+        return True
 
     def buyDeck(self):
         ...
