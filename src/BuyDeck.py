@@ -4,6 +4,9 @@ from Card import Card
 class BuyDeck(Deck):
     def __init__(self):
         super().__init__() # EGL -> Verificar necessidade dessa linha
+        self.generateAllCards()
+    
+    def generateAllCards(self):
         suits = ["C","E","O","P"]
         special_values = ["A", "J", "Q", "K"]
         for c in range(52):
@@ -13,3 +16,6 @@ class BuyDeck(Deck):
             self.cards.append(Card(value, suit, points))
         for c in range(2):
             self.cards.append(Card("Joker", "?", 0))
+
+    def addCard(self, card: Card):
+        self.cards.append(card)
