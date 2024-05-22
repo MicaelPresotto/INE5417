@@ -5,8 +5,14 @@ class Card:
         self.points = points
         self.selected = False
     
-    def get_value(self) -> str:
+    def getValue(self) -> str:
         return self.value
     
-    def get_suit(self) -> str:
+    def getSuit(self) -> str:
         return self.suit
+
+    def getPoints(self) -> int:
+        return self.points
+
+    def isSelected(self) -> bool:
+        return self.selected

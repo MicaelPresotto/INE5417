@@ -18,16 +18,16 @@ class Table:
         ...
 
     def isSet(self, cards: list) -> bool:
-        value = cards[0].get_value()
+        value = cards[0].getValue()
         for card in cards[1:]:
-            if card.get_value() != value: return False
+            if card.getValue() != value: return False
         return True
 
     def isSequence(self, cards: list) -> bool:
-        cards.sort(key = lambda c: c.get_value())
-        suit = cards[0].get_suit()
+        cards.sort(key = lambda c: c.getValue())
+        suit = cards[0].getSuit()
         for i in range(1, len(cards)):
-            if cards[i].get_suit() != suit or cards[i].get_value() - 1 != cards[i-1].get_value(): return False
+            if cards[i].getSuit() != suit or cards[i].getValue() - 1 != cards[i-1].getValue(): return False
         return True
 
     def buyDeck(self):
