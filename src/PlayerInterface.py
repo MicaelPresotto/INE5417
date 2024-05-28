@@ -63,7 +63,7 @@ class PlayerInterface(DogPlayerInterface):
         self.callYanivButton = tk.Button(
             self.mainWindow,
             text="Call yaniv",
-            command=self.onClickCallYaniv,
+            command = lambda : self.onClickOptYaniv(True),
             width=10,
             height=2,
             bg="white",
@@ -74,7 +74,7 @@ class PlayerInterface(DogPlayerInterface):
         self.dontCallYanivButton = tk.Button(
             self.mainWindow,
             text="Don't call yaniv",
-            command=self.onClickDontCallYaniv,
+            command= lambda : self.onClickOptYaniv(False),
             width=12,
             height=2,
             bg="white",
@@ -262,8 +262,8 @@ class PlayerInterface(DogPlayerInterface):
     def onClickExit(self):
         messagebox.showinfo("Exit", "Exit clicked")
 
-    def onClickCallYaniv(self):
-        messagebox.showinfo("Call yaniv", "Call yaniv clicked")
-
-    def onClickDontCallYaniv(self):
-        messagebox.showinfo("Call yaniv", "Call yaniv clicked")
+    def onClickOptYaniv(self, opt):
+        if opt:
+            messagebox.showinfo("Call yaniv", "Call yaniv clicked")
+        else:
+            messagebox.showinfo("Don't Call yaniv", "Don't Call yaniv clicked")
