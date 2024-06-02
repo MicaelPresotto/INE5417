@@ -45,3 +45,6 @@ class Player:
 
     def getCurrentHand(self) -> list:
         return self.currentHand
+    
+    def getTurn(self) -> bool:
+        return self.turn
