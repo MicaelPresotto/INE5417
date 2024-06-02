@@ -61,7 +61,9 @@ class Table:
         ...
     
     def applyPenaltyToOtherPlayers(self, playersQueue: list):
-        ...
+        for player in playersQueue:
+            if player.getTurn == False:
+                player.updateTotalPoints(10)
 
     def applyPenaltyToPlayer(self, player: Player):
         ...
