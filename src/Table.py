@@ -109,8 +109,11 @@ class Table:
                     message = "Match abandonned by oponnent"
                 case self.DEFINE_FINISHED_ROUND:
                     message = "Round finished!"
-            guiImage.setMessage(message)
-            return guiImage
+        else:
+            message = "Irregular move"
+        guiImage.setMessage(message)
+        return guiImage
+
         
     def resetPlayerQueue(self):
         ...
