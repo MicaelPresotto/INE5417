@@ -1,9 +1,10 @@
 from Deck import Deck
 from Card import Card
+from random import shuffle
 
 class BuyDeck(Deck):
     def __init__(self):
-        super().__init__() # EGL -> Verificar necessidade dessa linha
+        super().__init__()
         self.generateAllCards()
     
     def generateAllCards(self):
@@ -17,5 +18,5 @@ class BuyDeck(Deck):
         for c in range(2):
             self.cards.append(Card("Joker", "?", 0))
 
-    def addCard(self, card: Card):
-        self.cards.append(card)
+    def shuffle(self):
+        shuffle(self.cards)
