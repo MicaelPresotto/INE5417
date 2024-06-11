@@ -74,3 +74,9 @@ class Table:
     def verifyEndOfMatch(self, playersQueue: list) -> bool:
         ...
     
+    def isSet(self, cards : list) -> bool:
+        s = set()
+        for card in cards:
+            value = card.getValue()
+            if value != "0": s.add(value)
+        return len(s) == 1
