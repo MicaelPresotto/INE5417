@@ -5,7 +5,7 @@ from GUIImage import GUIImage
 
 class Table:
     def __init__(self):
-        self.players = [Player(f"Player {i}") for i in range(4)]
+        self.playersQueue = [Player(f"Player {i}") for i in range(4)]
         self.discardDeck = DiscardDeck()
         self.buyDeck = BuyDeck()
         self.message = ""
@@ -16,7 +16,7 @@ class Table:
         self.localPlayerId = ""
 
     def identifyTurnPlayer(self) -> Player:
-        for player in self.players:
+        for player in self.playersQueue:
             if player.getTurn(): return Player
 
     def getStatus(self) -> int:
@@ -77,7 +77,12 @@ class Table:
         ...
 
     def verifyEndOfMatch(self) -> bool:
-        ...
+        MAXSCORE = 100
+        for player in self.playersQueue:
+            if player.getTotalPoints() >= MAXSCORE:
+                return True
+        return False
+
 
     def updatePlayersQueueIndex(self):
         self.playersQueueIndex = (self.playersQueueIndex + 1) % len(self.players)
