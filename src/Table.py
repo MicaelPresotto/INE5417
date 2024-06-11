@@ -3,6 +3,15 @@ from DiscardDeck import DiscardDeck
 from BuyDeck import BuyDeck
 from GUIImage import GUIImage
 
+DEFINE_NO_MATCH = 0
+DEFINE_BUY_CARD_ACTION = 1
+DEFINE_DISCARD_OR_SELECT_CARD_ACTION = 2
+DEFINE_OPT_YANIV = 3
+DEFINE_WAITING_FOR_REMOTE_ACTION = 4
+DEFINE_FINISHED_MATCH = 5
+DEFINE_WITHDRAWAL = 6
+DEFINE_FINISHED_ROUND = 7
+
 class Table:
     def __init__(self):
         self.playersQueue = [Player(f"Player {i}") for i in range(4)]
@@ -57,7 +66,10 @@ class Table:
         ...
 
     def distributeCards(self):
-        ...
+        for player in self.playersQueue:
+            for _ in range(5):
+                card = self.buyDeck.popCard()
+                player.addCard(card)
 
     def getGUIImage(self) -> GUIImage:
         ...
@@ -73,8 +85,17 @@ class Table:
             if player.getTurn == False:
                 player.updateTotalPoints(10)
 
-    def endRound(self):
-        ...
+    def resetRound(self):
+        self.setTableStatus(DEFINE_BUY_CARD_ACTION)
+        for player in self.playersQueue:
+            cards = player.getCurrentHand()
+            player.clearHand()
+            self.buyDeck.addCardsToDeck(cards)
+        discardCards = self.discardDeck.cleanAndReturnCards()
+        self.buyDeck.addCardsToDeck(discardCards)
+        self.buyDeck.shuffle()
+        self.distributeCards()
+
 
     def verifyEndOfMatch(self) -> bool:
         MAXSCORE = 100
