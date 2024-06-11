@@ -2,15 +2,7 @@ from Player import Player
 from DiscardDeck import DiscardDeck
 from BuyDeck import BuyDeck
 from GUIImage import GUIImage
-
-DEFINE_NO_MATCH = 0
-DEFINE_BUY_CARD_ACTION = 1
-DEFINE_DISCARD_OR_SELECT_CARD_ACTION = 2
-DEFINE_OPT_YANIV = 3
-DEFINE_WAITING_FOR_REMOTE_ACTION = 4
-DEFINE_FINISHED_MATCH = 5
-DEFINE_WITHDRAWAL = 6
-DEFINE_FINISHED_ROUND = 7
+from PlayerInfo import PlayerInfo
 
 class Table:
     def __init__(self):
@@ -23,6 +15,15 @@ class Table:
         self.selectedDeck = None
         self.playersQueueIndex = 0
         self.localPlayerId = ""
+
+        self.DEFINE_NO_MATCH = 0
+        self.DEFINE_BUY_CARD_ACTION = 1
+        self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION = 2
+        self.DEFINE_OPT_YANIV = 3
+        self.DEFINE_WAITING_FOR_REMOTE_ACTION = 4
+        self.DEFINE_FINISHED_MATCH = 5
+        self.DEFINE_WITHDRAWAL = 6
+        self.DEFINE_FINISHED_ROUND = 7
 
     def identifyTurnPlayer(self) -> Player:
         for player in self.playersQueue:
@@ -72,8 +73,45 @@ class Table:
                 player.addCard(card)
 
     def getGUIImage(self) -> GUIImage:
-        ...
-
+        guiImage = GUIImage()
+        turnPlayer = self.identifyTurnPlayer()
+        name = turnPlayer.getName()
+        cards = self.discardDeck.getCards()
+        guiImage.setDiscardDeckFirstCard(cards[0])
+        lenBuyDeck = self.buyDeck.getSize()
+        guiImage.setBuyDeckEmpty(lenBuyDeck == 0)
+        playersInfo = []
+        for player in self.playersQueue:
+            playerHand = player.getCurrentHand()
+            id = player.getId()
+            if id == self.getLocalPlayerId(): guiImage.setLocalPlayerCurrentHand(playerHand)
+            nCards = len(playerHand)
+            points = player.getTotalPoints()
+            playerInfo = PlayerInfo(id, nCards, points)
+            playersInfo.append(playerInfo)
+        if "regularMove": #EGL 10/06/2024 -> discutir como obter regularMove, provavelmente
+                          # setar uma variavel membro booleana regularMove e atualizar a cada acao 
+            match self.tableStatus:
+                case self.DEFINE_NO_MATCH:
+                    message = "Start a match in the menu"
+                case self.DEFINE_BUY_CARD_ACTION:
+                    message = name + " must buy a card"
+                case self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION:
+                    message = name + " must discard"
+                case self.DEFINE_OPT_YANIV:
+                    message = name + " must opt for yaniv"
+                case self.DEFINE_WAITING_FOR_REMOTE_ACTION:
+                    message = "Turn player: " + name
+                case self.DEFINE_FINISHED_MATCH:
+                    winner = self.getWinner()
+                    message = "Winner: " + winner
+                case self.DEFINE_WITHDRAWAL:
+                    message = "Match abandonned by oponnent"
+                case self.DEFINE_FINISHED_ROUND:
+                    message = "Round finished!"
+            guiImage.setMessage(message)
+            return guiImage
+        
     def resetPlayerQueue(self):
         ...
 
@@ -86,7 +124,7 @@ class Table:
                 player.updateTotalPoints(10)
 
     def resetRound(self):
-        self.setTableStatus(DEFINE_BUY_CARD_ACTION)
+        self.setTableStatus(self.DEFINE_BUY_CARD_ACTION)
         for player in self.playersQueue:
             cards = player.getCurrentHand()
             player.clearHand()
@@ -110,3 +148,6 @@ class Table:
 
     def getLocalPlayerId(self) -> str:
         return self.localPlayerId
+    
+    def getWinner() -> Player:
+        ...
