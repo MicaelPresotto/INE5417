@@ -65,9 +65,10 @@ class Table:
             if player.getTurn == False:
                 player.updateTotalPoints(10)
 
-    def applyPenaltyToPlayer(self, player: Player):
-        ...
-
+    def applyPenaltyToOtherPlayers(self, playersQueue: list):
+        for player in playersQueue:
+            if player.getTurn() == False: player.updateTotalPoints(10)
+        
     def endRound(self):
         ...
 
