@@ -1,13 +1,13 @@
 from Card import Card
 
 class Player:
-    def __init__(self, id: int, name: str):
+    def __init__(self, id: str, name: str):
         self.id = id
         self.name = name
         self.turn = False
         self.totalPoints = 0
-        self.active = True
         self.currentHand = []
+        self.isWinner = False
 
     def addCard(self, card: Card):
         self.currentHand.append(card)
@@ -18,15 +18,12 @@ class Player:
     def removeCardsFromHand(self, cards: list):
         for card in cards:
             self.currentHand.remove(card)
-    
-    def clearStatus(self):
-        ...
-    
+
     def clearHand(self) -> list:
         previous_hand = self.currentHand.copy()
         self.currentHand = []
         return previous_hand
-
+    
     def toggleTurn(self):
         self.turn = not self.turn
     
@@ -50,7 +47,16 @@ class Player:
         self.totalPoints += value
 
     def getCurrentHand(self) -> list:
-        return self.currentHand
+        return self.currentHand.copy()
     
+    def setTotalPoints(self, points: int):
+        self.totalPoints = points
+
+    def getId(self) -> str:
+        return self.id
+    
+    def setWinner(self):
+        self.isWinner = True
+        
     def getTurn(self) -> bool:
         return self.turn
