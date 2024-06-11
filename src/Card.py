@@ -1,5 +1,6 @@
 class Card:
-    def __init__(self, value: str, suit: str, points: int):
+    def __init__(self, id: int, value: str, suit: str, points: int):
+        self.id = id
         self.value = value
         self.suit = suit
         self.points = points
@@ -16,3 +17,6 @@ class Card:
 
     def isSelected(self) -> bool:
         return self.selected
+    
+    def toggleSelected(self):
+        self.selected = not self.selected
