@@ -4,20 +4,20 @@ class PlayerInfo:
         self.numberOfCards = numberOfCards
         self.points = points
 
-    def getPlayerId(self):
+    def getPlayerId(self) -> str:
         return self.playerId
 
-    def setPlayerId(self, playerId):
+    def setPlayerId(self, playerId: str):
         self.playerId = playerId
 
-    def getNumberOfCards(self):
+    def getNumberOfCards(self) -> int:
         return self.numberOfCards
 
-    def setNumberOfCards(self, numberOfCards):
+    def setNumberOfCards(self, numberOfCards: int):
         self.numberOfCards = numberOfCards
 
-    def getPoints(self):
+    def getPoints(self) -> int:
         return self.points
 
-    def setPoints(self, points):
+    def setPoints(self, points: int):
         self.points = points
