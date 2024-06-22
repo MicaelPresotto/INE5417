@@ -3,7 +3,7 @@ from DiscardDeck import DiscardDeck
 from BuyDeck import BuyDeck
 from GUIImage import GUIImage
 from PlayerInfo import PlayerInfo
-
+from tkinter import messagebox
 class Table:
     def __init__(self):
         self.playersQueue = [Player(f"Player {i}") for i in range(4)]
@@ -30,7 +30,7 @@ class Table:
             if player.getTurn(): return Player
 
     def getStatus(self) -> int:
-        return self.status
+        return self.tableStatus
 
     def setTableStatus(self, status: int):
         self.status = status
@@ -43,28 +43,92 @@ class Table:
         return len(s) == 1
 
     def isSequence(self, cards: list) -> bool:
-        ...
+        for i in range(1,len(cards)):
+            if cards[i].getSuit() != cards[i-1].getSuit(): return False
+
+        values = [card.getValue() for card in cards]
+        values.sort()
+        for i in range(1, len(values)):
+            if values[i] - values[i-1] != 1: return False
+        return True
 
     def buyCard(self):
-        ...
-
+        turnPlayer = self.identifyTurnPlayer()
+        status = self.getStatus()
+        localPlayerId = self.getLocalPlayerId()
+        numCards = self.buyDeck.getSize()
+        if status == self.DEFINE_BUY_CARD_ACTION and turnPlayer.getId() == localPlayerId and numCards > 0:
+            card = self.buyDeck.popCard()
+            turnPlayer.addCard(card)
+            self.setTableStatus(self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION)
+            # send_move
+        else:
+            messagebox.showinfo("Invalid action", "You can't buy a card now")
     def discard(self):
-        ...
+        turnPlayer = self.identifyTurnPlayer()
+        status = self.getStatus()
+        localPlayerId = self.getLocalPlayerId()
+        if status == self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION and turnPlayer.getId() == localPlayerId:
+            selectedCards = turnPlayer.getSelectedCards()
+            if len(selectedCards) >= 2:
+                is_set = self.isSet(selectedCards)
+            elif len(selectedCards) >= 3:
+                is_sequence = self.isSequence(selectedCards)
+            if len(selectedCards) == 1 or is_sequence or is_set:
+                self.discardCards(selectedCards)
+                self.discardDeck.addCardsToDeck(selectedCards)
+                turnPlayer.removeCardsFromHand(selectedCards)
+                self.setTableStatus(self.DEFINE_OPT_YANIV)
+                # send_move
+            else:
+                messagebox.showinfo("Invalid action", "Invalid move")
+
 
     def receiveWithdrawalNotification(self):
-        ...
+        self.setTableStatus(self.DEFINE_WITHDRAWAL)
+        
+
 
     def receiveMove(self, a_move):
         ...
 
     def resetGame(self):
         ...
+        #msma coisa do start match
 
     def startMatch(self):
         ...
+        # acho que nao existe isso aqui?, pelo diagrama ta no player interface
     
-    def optYaniv(self) -> bool:
-        ...
+    def optYaniv(self, yanivOpt: bool) -> bool:
+        turnPlayer = self.identifyTurnPlayer()
+        status = self.getStatus()
+        localPlayerId = self.getLocalPlayerId()
+        if status == self.DEFINE_OPT_YANIV and turnPlayer.getId() == localPlayerId:
+            totalPoints = turnPlayer.getTotalPoints()
+            if yanivOpt:
+                if totalPoints <= 6:
+                    isLowest = turnPlayer.checkIfLowestHand(self.playersQueue)
+                    if isLowest:
+                        self.applyPenaltyToOtherPlayers(self.playersQueue)
+                if totalPoints > 6 or not isLowest:
+                    turnPlayer.updateTotalPoints(30)
+                match_finished = self.verifyEndOfMatch()
+                if match_finished:
+                    self.setTableStatus(self.DEFINE_FINISHED_MATCH)
+            else:
+                self.setTableStatus(self.DEFINE_WAITING_FOR_REMOTE_ACTION)
+            turnPlayer.toggleTurn()
+            self.updatePlayersQueueIndex()
+            self.playersQueue[0].toggleTurn()
+            # send_move
+            if yanivOpt and not match_finished:
+                self.setTableStatus(self.DEFINE_FINISHED_ROUND)
+                self.resetRound()
+                #send_move
+        else:
+            messagebox.showinfo("Invalid action", "Invalid move")
+            
 
     def distributeCards(self):
         for player in self.playersQueue:
@@ -152,5 +216,9 @@ class Table:
     def getLocalPlayerId(self) -> str:
         return self.localPlayerId
     
-    def getWinner() -> Player:
+    def getWinner(self) -> Player:
+        for player in self.playersQueue:
+            if player.getIsWinner(): return player
+
+    def discardCards(self, cards: list):
         ...

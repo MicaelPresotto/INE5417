@@ -63,3 +63,6 @@ class Player:
 
     def getName(self) -> str:
         return self.name
+    
+    def getIsWinner(self) -> bool:
+        return self.isWinner

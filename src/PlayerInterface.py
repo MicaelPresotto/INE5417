@@ -16,6 +16,7 @@ class PlayerInterface(DogPlayerInterface):
         self.dogActor = DogActor()
         self.connectingToDogServer()
         self.mainWindow.mainloop()
+        self.optYaniv = False
     
     def connectingToDogServer(self):
         playerName = simpledialog.askstring("Player name", "Enter your name")
