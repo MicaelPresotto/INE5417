@@ -3,9 +3,12 @@ from tkinter import messagebox, simpledialog
 from PIL import Image, ImageTk
 from dog.dog_actor import DogActor
 from dog.dog_interface import DogPlayerInterface
+from Table import Table
+from GUIImage import GUIImage
 
 class PlayerInterface(DogPlayerInterface):
     def __init__(self):
+        self.table = Table()
         self.mainWindow = tk.Tk()
         self.mainWindow.title("Yaniv")
         self.mainWindow.geometry("800x600")
@@ -16,7 +19,6 @@ class PlayerInterface(DogPlayerInterface):
         self.dogActor = DogActor()
         self.connectingToDogServer()
         self.mainWindow.mainloop()
-        self.optYaniv = False
     
     def connectingToDogServer(self):
         playerName = simpledialog.askstring("Player name", "Enter your name")
@@ -226,7 +228,7 @@ class PlayerInterface(DogPlayerInterface):
         self.menu.add_cascade(menu=self.menuFile, label="Menu")
 
         self.menuFile.add_command(label="Rules", command=self.onClickRules)
-        self.menuFile.add_command(label="Start game", command=self.onClickStart)
+        self.menuFile.add_command(label="Start game", command=self.startMatch)
         self.menuFile.add_command(label="Reset game", command=self.onClickReset)
         self.menuFile.add_separator()
         self.menuFile.add_command(label="Exit", command=self.onClickExit)
@@ -249,14 +251,6 @@ class PlayerInterface(DogPlayerInterface):
     def onClickRules(self):
         messagebox.showinfo("Rules", "Rules clicked")
 
-    def onClickStart(self):
-        status = self.dogActor.start_match(4)
-        code = int(status.code)
-        if code == 0 or code == 1:
-            messagebox.showinfo("Problema", status.message)
-            return
-        messagebox.showinfo("Start", status.message)
-
     def onClickReset(self):
         messagebox.showinfo("Reset", "Reset clicked")
 
@@ -268,3 +262,29 @@ class PlayerInterface(DogPlayerInterface):
             messagebox.showinfo("Call yaniv", "Call yaniv clicked")
         else:
             messagebox.showinfo("Don't Call yaniv", "Don't Call yaniv clicked")
+    
+    def startMatch(self):
+        status = self.table.getStatus()
+        if status == self.table.DEFINE_NO_MATCH:
+            answer = messagebox.askyesno("Start", "Start a new match?")
+            if answer:
+                startStatus = self.dogActor.start_match(2)
+                code = startStatus.get_code()
+                message = startStatus.get_message()
+                print(code)
+                if code == "0" or code == "1":
+                    messagebox.showinfo("Dog error", message)
+                elif code == "2":
+                    players = startStatus.get_players()
+                    localPlayerId = startStatus.get_local_id() # 22/06/2024 EGL: temos que atribuir o valor a Table antes de obter não?
+                    startStatus.get_local_id()
+                    self.table.setPlayersQueue(players)
+                    self.table.startMatch(players, localPlayerId)
+                # send_move
+                #guiImage = self.table.getGUIImage()
+                #self.updateGui(guiImage)
+        else:
+            messagebox.showinfo("Erro ao iniciar partida", "Partida já iniciada")
+                
+    def updateGui(guiImage: GUIImage):
+        ...

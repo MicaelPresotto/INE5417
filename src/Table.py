@@ -6,7 +6,7 @@ from PlayerInfo import PlayerInfo
 from tkinter import messagebox
 class Table:
     def __init__(self):
-        self.playersQueue = [Player(f"Player {i}") for i in range(4)]
+        self.playersQueue = []
         self.discardDeck = DiscardDeck()
         self.buyDeck = BuyDeck()
         self.message = ""
@@ -24,6 +24,10 @@ class Table:
         self.DEFINE_FINISHED_MATCH = 5
         self.DEFINE_WITHDRAWAL = 6
         self.DEFINE_FINISHED_ROUND = 7
+
+    def setPlayersQueue(self, playersQueue: list):
+        print(playersQueue)
+        self.playersQueue = [Player(p[1], p[0]) for p in playersQueue.copy()]
 
     def identifyTurnPlayer(self) -> Player:
         for player in self.playersQueue:
@@ -211,3 +215,8 @@ class Table:
     def getWinner(self) -> Player:
         for player in self.playersQueue:
             if player.getIsWinner(): return player
+    
+    def startMatch(self, players: list, localPlayerId: str):
+        self.resetRound()
+        print(players)
+        self.orderPlayerQueue()
