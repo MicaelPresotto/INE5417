@@ -55,14 +55,15 @@ class Table:
         turnPlayer = self.identifyTurnPlayer()
         status = self.getStatus()
         localPlayerId = self.getLocalPlayerId()
-        numCards = self.buyDeck.getSize()
+        numCards = self.selectedDeck.getSize()
         if status == self.DEFINE_BUY_CARD_ACTION and turnPlayer.getId() == localPlayerId and numCards > 0:
-            card = self.buyDeck.popCard()
+            card = self.selectedDeck.popCard()
             turnPlayer.addCard(card)
             self.setStatus(self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION)
             # send_move
         else:
             messagebox.showinfo("Invalid action", "You can't buy a card now")
+
     def discard(self):
         turnPlayer = self.identifyTurnPlayer()
         status = self.getStatus()
@@ -71,7 +72,7 @@ class Table:
             selectedCards = turnPlayer.getSelectedCards()
             if len(selectedCards) >= 2:
                 is_set = self.isSet(selectedCards)
-            elif len(selectedCards) >= 3:
+            if len(selectedCards) >= 3:
                 is_sequence = self.isSequence(selectedCards)
             if len(selectedCards) == 1 or is_sequence or is_set:
                 self.discardCards(selectedCards)
@@ -90,14 +91,6 @@ class Table:
 
     def receiveMove(self, a_move):
         ...
-
-    def resetGame(self):
-        ...
-        #msma coisa do start match
-
-    def startMatch(self):
-        ...
-        # acho que nao existe isso aqui?, pelo diagrama ta no player interface
     
     def optYaniv(self, yanivOpt: bool) -> bool:
         turnPlayer = self.identifyTurnPlayer()
@@ -218,6 +211,3 @@ class Table:
     def getWinner(self) -> Player:
         for player in self.playersQueue:
             if player.getIsWinner(): return player
-
-    def discardCards(self, cards: list):
-        ...
