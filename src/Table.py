@@ -11,7 +11,7 @@ class Table:
         self.buyDeck = BuyDeck()
         self.message = ""
         self.round = 0
-        self.tableStatus = 0
+        self.status = 0
         self.selectedDeck = None
         self.playersQueueIndex = 0
         self.localPlayerId = ""
@@ -30,9 +30,9 @@ class Table:
             if player.getTurn(): return Player
 
     def getStatus(self) -> int:
-        return self.tableStatus
+        return self.status
 
-    def setTableStatus(self, status: int):
+    def setStatus(self, status: int):
         self.status = status
 
     def isSet(self, cards : list) -> bool:
@@ -46,8 +46,7 @@ class Table:
         for i in range(1,len(cards)):
             if cards[i].getSuit() != cards[i-1].getSuit(): return False
 
-        values = [card.getValue() for card in cards]
-        values.sort()
+        values = [card.getValue() for card in cards].sort()
         for i in range(1, len(values)):
             if values[i] - values[i-1] != 1: return False
         return True
@@ -60,7 +59,7 @@ class Table:
         if status == self.DEFINE_BUY_CARD_ACTION and turnPlayer.getId() == localPlayerId and numCards > 0:
             card = self.buyDeck.popCard()
             turnPlayer.addCard(card)
-            self.setTableStatus(self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION)
+            self.setStatus(self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION)
             # send_move
         else:
             messagebox.showinfo("Invalid action", "You can't buy a card now")
@@ -78,14 +77,14 @@ class Table:
                 self.discardCards(selectedCards)
                 self.discardDeck.addCardsToDeck(selectedCards)
                 turnPlayer.removeCardsFromHand(selectedCards)
-                self.setTableStatus(self.DEFINE_OPT_YANIV)
+                self.setStatus(self.DEFINE_OPT_YANIV)
                 # send_move
             else:
                 messagebox.showinfo("Invalid action", "Invalid move")
 
 
     def receiveWithdrawalNotification(self):
-        self.setTableStatus(self.DEFINE_WITHDRAWAL)
+        self.setStatus(self.DEFINE_WITHDRAWAL)
         
 
 
@@ -115,15 +114,15 @@ class Table:
                     turnPlayer.updateTotalPoints(30)
                 match_finished = self.verifyEndOfMatch()
                 if match_finished:
-                    self.setTableStatus(self.DEFINE_FINISHED_MATCH)
+                    self.setStatus(self.DEFINE_FINISHED_MATCH)
             else:
-                self.setTableStatus(self.DEFINE_WAITING_FOR_REMOTE_ACTION)
+                self.setStatus(self.DEFINE_WAITING_FOR_REMOTE_ACTION)
             turnPlayer.toggleTurn()
             self.updatePlayersQueueIndex()
             self.playersQueue[0].toggleTurn()
             # send_move
             if yanivOpt and not match_finished:
-                self.setTableStatus(self.DEFINE_FINISHED_ROUND)
+                self.setStatus(self.DEFINE_FINISHED_ROUND)
                 self.resetRound()
                 #send_move
         else:
@@ -155,7 +154,7 @@ class Table:
             playersInfo.append(playerInfo)
         if "regularMove": #EGL 10/06/2024 -> discutir como obter regularMove, provavelmente
                           # setar uma variavel membro booleana regularMove e atualizar a cada acao 
-            match self.tableStatus:
+            match self.status:
                 case self.DEFINE_NO_MATCH:
                     message = "Start a match in the menu"
                 case self.DEFINE_BUY_CARD_ACTION:
@@ -191,7 +190,7 @@ class Table:
                 player.updateTotalPoints(10)
 
     def resetRound(self):
-        self.setTableStatus(self.DEFINE_BUY_CARD_ACTION)
+        self.setStatus(self.DEFINE_BUY_CARD_ACTION)
         for player in self.playersQueue:
             cards = player.getCurrentHand()
             player.clearHand()
