@@ -14,9 +14,9 @@ class BuyDeck(Deck):
             value = str(c % 13 + 1) if (c % 13 + 1) not in [1,11,12,13] else special_values[(c % 13) % 9]
             suit = suits[c // 13]
             points = min((c % 13 + 1), 10)
-            self.cards.append(Card(c, value, suit, points))
+            self.cards.append(Card(c, value, suit, points, c % 13 + 1))
         for c in range(2):
-            self.cards.append(Card(c + 52, "Joker", "?", 0))
+            self.cards.append(Card(c + 52, "Joker", "?", 0, 0))
 
     def shuffle(self):
         shuffle(self.cards)

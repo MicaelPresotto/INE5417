@@ -56,7 +56,7 @@ class PlayerInterface(DogPlayerInterface):
         self.discardButton = tk.Button(
             self.mainWindow,
             text="Discard",
-            command=self.onClickDiscard,
+            command=self.discard,
             width=10,
             height=2,
             bg="white",
@@ -66,7 +66,7 @@ class PlayerInterface(DogPlayerInterface):
         self.callYanivButton = tk.Button(
             self.mainWindow,
             text="Call yaniv",
-            command = lambda : self.onClickOptYaniv(True),
+            command = lambda : self.optYaniv(True),
             width=10,
             height=2,
             bg="white",
@@ -77,7 +77,7 @@ class PlayerInterface(DogPlayerInterface):
         self.dontCallYanivButton = tk.Button(
             self.mainWindow,
             text="Don't call yaniv",
-            command= lambda : self.onClickOptYaniv(False),
+            command= lambda : self.optYaniv(False),
             width=12,
             height=2,
             bg="white",
@@ -88,7 +88,7 @@ class PlayerInterface(DogPlayerInterface):
         buyDeck = tk.Label(self.mainWindow, image=imageBuyDeck, bd=0, bg="darkgreen")
         buyDeck.imagem = imageBuyDeck
         buyDeck.place(relx=0.3, rely=0.4)
-        buyDeck.bind("<Button-1>", lambda event: self.onClickBuy())
+        buyDeck.bind("<Button-1>", lambda event: self.buyCard())
 
         imageDiscardDeck= tk.PhotoImage(file="cards/7C.png")
         discardDeck= tk.Label(
@@ -233,11 +233,11 @@ class PlayerInterface(DogPlayerInterface):
         self.menuFile.add_separator()
         self.menuFile.add_command(label="Exit", command=self.onClickExit)
 
-    def onClickBuy(self):
+    def buyCard(self):
         self.table.buyCard(True)
         #send move
 
-    def onClickDiscard(self):
+    def discard(self):
         self.table.discard()
         #send move
 
@@ -262,11 +262,11 @@ class PlayerInterface(DogPlayerInterface):
     def onClickExit(self):
         messagebox.showinfo("Exit", "Exit clicked")
 
-    def onClickOptYaniv(self, opt):
+    def optYaniv(self, opt):
         match_finished = self.table.optYaniv(opt)
         # send_move
         if opt and not match_finished:
-            self.table.setStatus(self.DEFINE_FINISHED_ROUND)
+            self.table.setStatus(7)
             self.table.resetRound()
             #send_move
     
@@ -278,15 +278,14 @@ class PlayerInterface(DogPlayerInterface):
                 startStatus = self.dogActor.start_match(2)
                 code = startStatus.get_code()
                 message = startStatus.get_message()
-                print(code)
                 if code == "0" or code == "1":
                     messagebox.showinfo("Dog error", message)
                 elif code == "2":
                     players = startStatus.get_players()
-                    localPlayerId = startStatus.get_local_id() # 22/06/2024 EGL: temos que atribuir o valor a Table antes de obter não?
-                    startStatus.get_local_id()
+                    localPlayerId = startStatus.get_local_id()
+                    self.table.setLocalPlayerId(localPlayerId)
                     self.table.setPlayersQueue(players)
-                    self.table.startMatch(players, localPlayerId)
+                    self.table.startMatch()
                 # send_move
                 #guiImage = self.table.getGUIImage()
                 #self.updateGui(guiImage)

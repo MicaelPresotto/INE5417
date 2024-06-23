@@ -25,9 +25,11 @@ class Table:
         self.DEFINE_WITHDRAWAL = 6
         self.DEFINE_FINISHED_ROUND = 7
 
+    def setLocalPlayerId(self, localPlayerId: str):
+        self.localPlayerId = localPlayerId
+
     def setPlayersQueue(self, playersQueue: list):
-        print(playersQueue)
-        self.playersQueue = [Player(p[1], p[0]) for p in playersQueue.copy()]
+        self.playersQueue = [Player(p[1], p[0]) for p in playersQueue]
 
     def identifyTurnPlayer(self) -> Player:
         for player in self.playersQueue:
@@ -48,11 +50,30 @@ class Table:
 
     def isSequence(self, cards: list) -> bool:
         for i in range(1,len(cards)):
+            # se for coringa, não verifica se tem o mesmo naipe
+            if cards[i].getValue() == "Joker" or cards[i-1].getValue() == "Joker": continue
             if cards[i].getSuit() != cards[i-1].getSuit(): return False
 
-        values = [card.getValue() for card in cards].sort()
+        values = [card.getNumber() for card in cards].sort()
+        # contador de coringas
+        countJokers = 0
         for i in range(1, len(values)):
-            if values[i] - values[i-1] != 1: return False
+            # se leu coringa, incrementa
+            if values[i] == 0: 
+                countJokers += 1
+                continue
+            # se a carta atual ou a anterior for um coringa, continua
+            if values[i] == 0 or values[i-1] == 0: continue
+            # se a carta atual - a anterior não for 1, tenta gastar um coringa
+            diff = values[i] - values[i-1]
+            if diff == 0: return False
+            if diff != 1:
+                # se tem coringas, gasta quantos precisam pra preencher o "espaço" entre as cartas
+                if countJokers >= diff - 1:
+                    countJokers -= diff - 1
+                # senão ta errado
+                else:
+                    return False
         return True
 
     def buyCard(self, isBuyDeck: bool):
@@ -244,9 +265,8 @@ class Table:
         for player in self.playersQueue:
             if player.getIsWinner(): return player
     
-    def startMatch(self, players: list, localPlayerId: str):
+    def startMatch(self):
         self.resetRound()
-        print(players)
         self.orderPlayerQueue()
     
     def selectCard(self, cardId: int):
