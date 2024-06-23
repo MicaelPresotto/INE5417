@@ -271,6 +271,7 @@ class PlayerInterface(DogPlayerInterface):
             #send_move
     
     def startMatch(self):
+        print("Vou start a partida")
         status = self.table.getStatus()
         if status == self.table.DEFINE_NO_MATCH:
             answer = messagebox.askyesno("Start", "Start a new match?")
@@ -283,8 +284,8 @@ class PlayerInterface(DogPlayerInterface):
                 elif code == "2":
                     players = startStatus.get_players()
                     localPlayerId = startStatus.get_local_id()
-                    self.table.setLocalPlayerId(localPlayerId)
                     self.table.setPlayersQueue(players)
+                    self.table.setLocalPlayerId(localPlayerId)
                     self.table.startMatch()
                 # send_move
                 #guiImage = self.table.getGUIImage()

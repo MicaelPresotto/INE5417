@@ -12,7 +12,6 @@ class Table:
         self.message = ""
         self.round = 0
         self.status = 0
-        self.selectedDeck = None
         self.playersQueueIndex = 0
         self.localPlayerId = ""
 
@@ -28,12 +27,19 @@ class Table:
     def setLocalPlayerId(self, localPlayerId: str):
         self.localPlayerId = localPlayerId
 
+    def toggleTurnById(self, id: str):
+        for player in self.playersQueue:
+            if player.getId() == id:
+                player.toggleTurn()
+    
     def setPlayersQueue(self, playersQueue: list):
         self.playersQueue = [Player(p[1], p[0]) for p in playersQueue]
 
     def identifyTurnPlayer(self) -> Player:
         for player in self.playersQueue:
-            if player.getTurn(): return Player
+            print(player.__dict__)
+            if player.getTurn(): return player
+            print('não é o player da vez')
 
     def getStatus(self) -> int:
         return self.status
@@ -78,18 +84,23 @@ class Table:
 
     def buyCard(self, isBuyDeck: bool):
         turnPlayer = self.identifyTurnPlayer()
+        print(f"Player da vez é {turnPlayer.getName()}")
         status = self.getStatus()
         localPlayerId = self.getLocalPlayerId()
-        if isBuyDeck:
-            self.selectedDeck = self.buyDeck
-        else:
-            self.selectedDeck = self.discardDeck
-        numCards = self.selectedDeck.getSize()
+        selectedDeck = self.buyDeck
+        if not isBuyDeck:
+            selectedDeck = self.discardDeck
+        print(f"Deck selecionado foi {'BuyDeck' if isBuyDeck else 'DiscardDeck'}")
+        numCards = selectedDeck.getSize()
+        print(f"Número de cartas {numCards}")
         if status == self.DEFINE_BUY_CARD_ACTION and turnPlayer.getId() == localPlayerId and numCards > 0:
-            card = self.selectedDeck.popCard()
+            card = selectedDeck.popCard()
+            print(f"Pegou a carta {card.__dict__}")
             turnPlayer.addCard(card)
+            print(f"Mão do jogador {turnPlayer.getName()} agora virou {[card.__dict__ for card in turnPlayer.getCurrentHand()]}")
             self.setStatus(self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION)
         else:
+            print(f"DEFINE_BUY_CARD_ACTION != {status} ou {localPlayerId} != {turnPlayer.getId()} ou {numCards} <= 0:")
             messagebox.showinfo("Invalid action", "You can't buy a card now")
 
     def discard(self):
@@ -98,6 +109,9 @@ class Table:
         localPlayerId = self.getLocalPlayerId()
         if status == self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION and turnPlayer.getId() == localPlayerId:
             selectedCards = turnPlayer.getSelectedCards()
+            if len(selectedCards) == 0:
+                messagebox.showinfo("Selecione uma carta", "Selecione pelo menos uma carta")
+                return False
             if len(selectedCards) >= 2:
                 is_set = self.isSet(selectedCards)
             if len(selectedCards) >= 3:
@@ -239,11 +253,15 @@ class Table:
         self.setStatus(self.DEFINE_BUY_CARD_ACTION)
         for player in self.playersQueue:
             cards = player.getCurrentHand()
+            print(f"{player.getName()} tinha mão {[card.__dict__ for card in cards]} e foi limpa")
             player.clearHand()
             self.buyDeck.addCardsToDeck(cards)
         discardCards = self.discardDeck.cleanAndReturnCards()
+        print(f"DiscardCards tinha mão {[card.__dict__ for card in discardCards]} e foi limpa")
         self.buyDeck.addCardsToDeck(discardCards)
+        print(f"Mão do buyDeck {[card.__dict__ for card in self.buyDeck.cards]}")
         self.buyDeck.shuffle()
+        print(f"Mão do buyDeck embaralhada {[card.__dict__ for card in self.buyDeck.cards]}")
         self.distributeCards()
 
 
@@ -267,7 +285,8 @@ class Table:
     
     def startMatch(self):
         self.resetRound()
-        self.orderPlayerQueue()
+        self.toggleTurnById(self.localPlayerId)
+        #self.orderPlayerQueue()
     
     def selectCard(self, cardId: int):
         turnPlayer = self.identifyTurnPlayer()
@@ -277,4 +296,5 @@ class Table:
             selectedCard = turnPlayer.findSelectedCardById(cardId)
             selectedCard.toggleSelected()
         else:
+            print(f"Status = {status} != 2 ou {turnPlayer.getId()} != {localPlayerId} ")
             messagebox.showinfo("Invalid action", "You can't select a card now")
