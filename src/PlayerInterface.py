@@ -234,16 +234,18 @@ class PlayerInterface(DogPlayerInterface):
         self.menuFile.add_command(label="Exit", command=self.onClickExit)
 
     def onClickBuy(self):
-        messagebox.showinfo("Buy Deck", "Buy deck clicked")
+        self.table.buyCard()
+        #send move
 
     def onClickDiscard(self):
-        messagebox.showinfo("Discard", "Discard clicked")
+        self.table.discard()
+        #send move
 
     def onClickDiscardDeck(self):
         messagebox.showinfo("Discard Deck", "Discard deck clicked")
 
-    def onClickCard(self, card):
-        messagebox.showinfo("Card", f"Card {card} clicked")
+    def onClickCard(self, cardId):
+        self.table.selectCard(cardId)
 
     def onClickTake(self):
         messagebox.showinfo("Take", "Take clicked")
@@ -252,16 +254,21 @@ class PlayerInterface(DogPlayerInterface):
         messagebox.showinfo("Rules", "Rules clicked")
 
     def onClickReset(self):
-        messagebox.showinfo("Reset", "Reset clicked")
+        self.table.resetGame()
+        # send_move
+        guiImage = self.table.getGUIImage()
+        self.updateGui(guiImage)
 
     def onClickExit(self):
         messagebox.showinfo("Exit", "Exit clicked")
 
     def onClickOptYaniv(self, opt):
-        if opt:
-            messagebox.showinfo("Call yaniv", "Call yaniv clicked")
-        else:
-            messagebox.showinfo("Don't Call yaniv", "Don't Call yaniv clicked")
+        match_finished = self.table.optYaniv(opt)
+        # send_move
+        if opt and not match_finished:
+            self.table.setStatus(self.DEFINE_FINISHED_ROUND)
+            self.table.resetRound()
+            #send_move
     
     def startMatch(self):
         status = self.table.getStatus()
@@ -285,6 +292,11 @@ class PlayerInterface(DogPlayerInterface):
                 #self.updateGui(guiImage)
         else:
             messagebox.showinfo("Erro ao iniciar partida", "Partida já iniciada")
+
+    def receive_move(self, a_move):
+        self.table.receiveMove(a_move)
+        guiImage = self.table.getGUIImage()
+        self.updateGui(guiImage)
                 
     def updateGui(guiImage: GUIImage):
         ...

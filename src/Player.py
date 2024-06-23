@@ -49,6 +49,9 @@ class Player:
     def getCurrentHand(self) -> list:
         return self.currentHand.copy()
     
+    def setCurrentHand(self, hand: list):
+        self.currentHand = hand.copy()
+    
     def setTotalPoints(self, points: int):
         self.totalPoints = points
 
@@ -66,3 +69,9 @@ class Player:
     
     def getIsWinner(self) -> bool:
         return self.isWinner
+    
+    def findSelectedCardById(self, cardId: int) -> Card:
+        for card in self.currentHand:
+            if card.getId() == cardId:
+                return card
+        return None

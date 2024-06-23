@@ -64,7 +64,6 @@ class Table:
             card = self.selectedDeck.popCard()
             turnPlayer.addCard(card)
             self.setStatus(self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION)
-            # send_move
         else:
             messagebox.showinfo("Invalid action", "You can't buy a card now")
 
@@ -83,7 +82,6 @@ class Table:
                 self.discardDeck.addCardsToDeck(selectedCards)
                 turnPlayer.removeCardsFromHand(selectedCards)
                 self.setStatus(self.DEFINE_OPT_YANIV)
-                # send_move
             else:
                 messagebox.showinfo("Invalid action", "Invalid move")
 
@@ -93,8 +91,23 @@ class Table:
         
 
 
-    def receiveMove(self, a_move):
-        ...
+    def receiveMove(self, a_move: dict):
+        code = a_move["code"]
+        if code == "RESET ROUND":
+            for player in self.playersQueue:
+                player.setCurrentHand(a_move[f"player{player.getId()} hand"])
+            self.discardDeck.setCards(a_move["discardDeck"])
+            self.buyDeck.setCards(a_move["buyDeck"])
+        if code == "BUY CARD":
+            self.buyCard()
+        if code == "DISCARD":
+            self.discard()
+        if code == "YANIV":
+            self.optYaniv(a_move["yanivOpt"])
+        if code == "WITHDRAWAL":
+            self.receiveWithdrawalNotification()
+        
+        
     
     def optYaniv(self, yanivOpt: bool) -> bool:
         turnPlayer = self.identifyTurnPlayer()
@@ -117,11 +130,7 @@ class Table:
             turnPlayer.toggleTurn()
             self.updatePlayersQueueIndex()
             self.playersQueue[0].toggleTurn()
-            # send_move
-            if yanivOpt and not match_finished:
-                self.setStatus(self.DEFINE_FINISHED_ROUND)
-                self.resetRound()
-                #send_move
+            return match_finished
         else:
             messagebox.showinfo("Invalid action", "Invalid move")
             
@@ -179,12 +188,27 @@ class Table:
         ...
 
     def orderPlayerQueue(self):
-        ...
+        self.playersQueue.sort(key=lambda x: x.id)
     
-    def applyPenaltyToOtherPlayers(self, playersQueue: list):
-        for player in playersQueue:
+    def applyPenaltyToOtherPlayers(self):
+        for player in self.playersQueue:
             if player.getTurn == False:
                 player.updateTotalPoints(10)
+
+    def resetGame(self):
+        status = self.getStatus()
+        turnPlayer = self.identifyTurnPlayer()
+        if status == self.DEFINE_FINISHED_MATCH or status == self.DEFINE_WITHDRAWAL:
+            for player in self.playersQueue:
+                player.setTotalPoints(0)
+                player.setWinner(False)
+            self.resetRound()
+            turnPlayer.toggleTurn()
+            self.updatePlayersQueueIndex()
+            self.playersQueue[0].toggleTurn()
+        else:
+            messagebox.showinfo("Invalid action", "You can't reset the game now")
+
 
     def resetRound(self):
         self.setStatus(self.DEFINE_BUY_CARD_ACTION)
@@ -220,3 +244,13 @@ class Table:
         self.resetRound()
         print(players)
         self.orderPlayerQueue()
+    
+    def selectCard(self, cardId: int):
+        turnPlayer = self.identifyTurnPlayer()
+        status = self.getStatus()
+        localPlayerId = self.getLocalPlayerId()
+        if status == self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION and turnPlayer.getId() == localPlayerId:
+            selectedCard = turnPlayer.findSelectedCardById(cardId)
+            selectedCard.toggleSelected()
+        else:
+            messagebox.showinfo("Invalid action", "You can't select a card now")
