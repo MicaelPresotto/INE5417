@@ -254,7 +254,7 @@ class Table:
         status = self.getStatus()
         localPlayerId = self.getLocalPlayerId()
         if status == self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION and turnPlayer.getId() == localPlayerId:
-            selectedCard = turnPlayer.findSelectedCardById(car)
+            selectedCard = turnPlayer.findSelectedCardById(cardId)
             selectedCard.toggleSelected()
         else:
             messagebox.showinfo("Invalid action", "You can't select a card now")
