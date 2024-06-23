@@ -234,7 +234,7 @@ class PlayerInterface(DogPlayerInterface):
         self.menuFile.add_command(label="Exit", command=self.onClickExit)
 
     def onClickBuy(self):
-        self.table.buyCard()
+        self.table.buyCard(True)
         #send move
 
     def onClickDiscard(self):
@@ -242,7 +242,7 @@ class PlayerInterface(DogPlayerInterface):
         #send move
 
     def onClickDiscardDeck(self):
-        messagebox.showinfo("Discard Deck", "Discard deck clicked")
+        self.table.buyCard(False)
 
     def onClickCard(self, cardId):
         self.table.selectCard(cardId)

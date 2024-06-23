@@ -55,10 +55,14 @@ class Table:
             if values[i] - values[i-1] != 1: return False
         return True
 
-    def buyCard(self):
+    def buyCard(self, isBuyDeck: bool):
         turnPlayer = self.identifyTurnPlayer()
         status = self.getStatus()
         localPlayerId = self.getLocalPlayerId()
+        if isBuyDeck:
+            self.selectedDeck = self.buyDeck
+        else:
+            self.selectedDeck = self.discardDeck
         numCards = self.selectedDeck.getSize()
         if status == self.DEFINE_BUY_CARD_ACTION and turnPlayer.getId() == localPlayerId and numCards > 0:
             card = self.selectedDeck.popCard()
@@ -250,7 +254,7 @@ class Table:
         status = self.getStatus()
         localPlayerId = self.getLocalPlayerId()
         if status == self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION and turnPlayer.getId() == localPlayerId:
-            selectedCard = turnPlayer.findSelectedCardById(cardId)
+            selectedCard = turnPlayer.findSelectedCardById(car)
             selectedCard.toggleSelected()
         else:
             messagebox.showinfo("Invalid action", "You can't select a card now")
