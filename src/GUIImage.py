@@ -2,7 +2,7 @@ from Card import Card
 
 class GUIImage:
     
-    def getDiscardDeckFirstCard(self) -> list:
+    def getDiscardDeckFirstCard(self) -> Card:
         return self.discardDeckFirstCard
 
     def setDiscardDeckFirstCard(self, card: Card):
