@@ -16,7 +16,7 @@ class BuyDeck(Deck):
             points = min((c % 13 + 1), 10)
             self.cards.append(Card(c, value, suit, points, c % 13 + 1))
         for c in range(2):
-            self.cards.append(Card(c + 52, "Joker", "?", 0, 0))
+            self.cards.append(Card(c + 52, "Joker", "_", 0, 0))
 
     def shuffle(self):
         shuffle(self.cards)

@@ -113,7 +113,7 @@ class PlayerInterface(DogPlayerInterface):
         # bottom
         for i in range(6):
             card = tk.Label(self.mainWindow, bd=0, bg="darkgreen")
-            card.place(relx=0.3 + i * 0.07, rely=0.8)
+            card.place(relx=0.25 + i * 0.07, rely=0.8)
             self.cardLabels.append(card)
 
         # left
@@ -298,14 +298,13 @@ class PlayerInterface(DogPlayerInterface):
         self.updateGui(guiImage)
                 
     def updateGui(self, guiImage: GUIImage):
+        select_card = lambda x: (lambda p: self.selectCard(x))
         for i, card in enumerate(guiImage.getLocalPlayerCurrentHand()):
             cardLabel = self.cardLabels[i]
             cardImage = ImageTk.PhotoImage(Image.open(f"cards/{card.getValue()}{card.getSuit()}.png"))
-            if (card.isSelected()):
-                print(f"Card {card.getNumber()} {card.getSuit()} is selected")
             cardLabel.config(image = cardImage, borderwidth= 2 if card.isSelected() else 0, relief="solid")
             cardLabel.photo_ref = cardImage
-            cardLabel.bind("<Button-1>", lambda e: self.selectCard(card.getId()))
+            cardLabel.bind("<Button-1>", select_card(card.getId()))
 
         for j in range(6 - len(guiImage.getLocalPlayerCurrentHand())):
             cardLabel = self.cardLabels[-(j + 1)]

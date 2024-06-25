@@ -112,8 +112,7 @@ class Table:
                 is_set = self.isSet(selectedCards)
             if len(selectedCards) >= 3:
                 is_sequence = self.isSequence(selectedCards)
-            if len(selectedCards) == 1 or is_sequence or is_set:
-                self.discardCards(selectedCards)
+            if len(selectedCards) == 1 or is_set or is_sequence:
                 self.discardDeck.addCardsToDeck(selectedCards)
                 turnPlayer.removeCardsFromHand(selectedCards)
                 self.setStatus(self.DEFINE_OPT_YANIV)
