@@ -8,7 +8,6 @@ from GUIImage import GUIImage
 
 class PlayerInterface(DogPlayerInterface):
     def __init__(self):
-        self.table = Table()
         self.mainWindow = tk.Tk()
         self.mainWindow.title("Yaniv")
         self.mainWindow.geometry("800x600")
@@ -16,6 +15,7 @@ class PlayerInterface(DogPlayerInterface):
         self.mainWindow.resizable(width=False, height=False)
         self.createWidgets()
         self.createMenu()
+        self.table = Table()
         self.dogActor = DogActor()
         self.connectingToDogServer()
         self.mainWindow.mainloop()
@@ -88,7 +88,7 @@ class PlayerInterface(DogPlayerInterface):
         buyDeck = tk.Label(self.mainWindow, image=imageBuyDeck, bd=0, bg="darkgreen")
         buyDeck.imagem = imageBuyDeck
         buyDeck.place(relx=0.3, rely=0.4)
-        buyDeck.bind("<Button-1>", lambda event: self.buyCard())
+        buyDeck.bind("<Button-1>", lambda event: self.buyCard(isBuyDeck=True))
 
         imageDiscardDeck= tk.PhotoImage(file="cards/7C.png")
         discardDeck= tk.Label(
@@ -96,7 +96,7 @@ class PlayerInterface(DogPlayerInterface):
         )
         discardDeck.imagem = imageDiscardDeck
         discardDeck.place(relx=0.58, rely=0.4)
-        discardDeck.bind("<Button-1>", lambda event: self.onClickDiscardDeck())
+        discardDeck.bind("<Button-1>", lambda event: self.buyCard(isBuyDeck=False))
 
         self.roundLabel = tk.Label(
             self.mainWindow,
@@ -108,16 +108,13 @@ class PlayerInterface(DogPlayerInterface):
 
         self.roundLabel.place(relx=0.85, rely=0.02)
 
-        myCards = ["2C", "3C", "4C", "5C", "6C"]
+        self.cardLabels : list[tk.Label] = []
 
         # bottom
-        for i in range(len(myCards)):
-            cardImage = Image.open(f"cards/{myCards[i]}.png")
-            cardImage = ImageTk.PhotoImage(cardImage)
-            w = tk.Label(self.mainWindow, image=cardImage, bd=0, bg="darkgreen")
-            w.bind("<Button-1>", lambda event, idx=i: self.onClickCard(myCards[idx]))
-            w.image = cardImage
-            w.place(relx=0.3 + i * 0.07, rely=0.8)
+        for i in range(6):
+            card = tk.Label(self.mainWindow, bd=0, bg="darkgreen")
+            card.place(relx=0.3 + i * 0.07, rely=0.8)
+            self.cardLabels.append(card)
 
         # left
         for i in range(5):
@@ -233,22 +230,22 @@ class PlayerInterface(DogPlayerInterface):
         self.menuFile.add_separator()
         self.menuFile.add_command(label="Exit", command=self.onClickExit)
 
-    def buyCard(self):
-        self.table.buyCard(True)
+    def buyCard(self, isBuyDeck):
+        self.table.buyCard(isBuyDeck)
         #send move
+        guiImage = self.table.getGUIImage()
+        self.updateGui(guiImage)
 
     def discard(self):
         self.table.discard()
         #send move
+        guiImage = self.table.getGUIImage()
+        self.updateGui(guiImage)
 
-    def onClickDiscardDeck(self):
-        self.table.buyCard(False)
-
-    def onClickCard(self, cardId):
+    def selectCard(self, cardId):
         self.table.selectCard(cardId)
-
-    def onClickTake(self):
-        messagebox.showinfo("Take", "Take clicked")
+        guiImage = self.table.getGUIImage()
+        self.updateGui(guiImage)
 
     def onClickRules(self):
         messagebox.showinfo("Rules", "Rules clicked")
@@ -266,9 +263,11 @@ class PlayerInterface(DogPlayerInterface):
         match_finished = self.table.optYaniv(opt)
         # send_move
         if opt and not match_finished:
-            self.table.setStatus(7)
+            self.table.setStatus(self.table.DEFINE_FINISHED_ROUND)
             self.table.resetRound()
             #send_move
+        guiImage = self.table.getGUIImage()
+        self.updateGui(guiImage)
     
     def startMatch(self):
         print("Vou start a partida")
@@ -288,8 +287,8 @@ class PlayerInterface(DogPlayerInterface):
                     self.table.setLocalPlayerId(localPlayerId)
                     self.table.startMatch()
                 # send_move
-                #guiImage = self.table.getGUIImage()
-                #self.updateGui(guiImage)
+                guiImage = self.table.getGUIImage()
+                self.updateGui(guiImage)
         else:
             messagebox.showinfo("Erro ao iniciar partida", "Partida já iniciada")
 
@@ -298,5 +297,16 @@ class PlayerInterface(DogPlayerInterface):
         guiImage = self.table.getGUIImage()
         self.updateGui(guiImage)
                 
-    def updateGui(guiImage: GUIImage):
-        ...
+    def updateGui(self, guiImage: GUIImage):
+        for i, card in enumerate(guiImage.getLocalPlayerCurrentHand()):
+            cardLabel = self.cardLabels[i]
+            cardImage = ImageTk.PhotoImage(Image.open(f"cards/{card.getValue()}{card.getSuit()}.png"))
+            if (card.isSelected()):
+                print(f"Card {card.getNumber()} {card.getSuit()} is selected")
+            cardLabel.config(image = cardImage, borderwidth= 2 if card.isSelected() else 0, relief="solid")
+            cardLabel.photo_ref = cardImage
+            cardLabel.bind("<Button-1>", lambda e: self.selectCard(card.getId()))
+
+        for j in range(6 - len(guiImage.getLocalPlayerCurrentHand())):
+            cardLabel = self.cardLabels[-(j + 1)]
+            cardLabel.config(image = "", borderwidth = 0)

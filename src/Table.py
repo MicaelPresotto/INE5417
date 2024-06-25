@@ -14,6 +14,7 @@ class Table:
         self.status = 0
         self.playersQueueIndex = 0
         self.localPlayerId = ""
+        self.regularMove = True
 
         self.DEFINE_NO_MATCH = 0
         self.DEFINE_BUY_CARD_ACTION = 1
@@ -37,7 +38,6 @@ class Table:
 
     def identifyTurnPlayer(self) -> Player:
         for player in self.playersQueue:
-            print(player.__dict__)
             if player.getTurn(): return player
             print('não é o player da vez')
 
@@ -87,21 +87,17 @@ class Table:
         print(f"Player da vez é {turnPlayer.getName()}")
         status = self.getStatus()
         localPlayerId = self.getLocalPlayerId()
-        selectedDeck = self.buyDeck
-        if not isBuyDeck:
-            selectedDeck = self.discardDeck
-        print(f"Deck selecionado foi {'BuyDeck' if isBuyDeck else 'DiscardDeck'}")
+        selectedDeck = self.buyDeck if isBuyDeck else self.discardDeck
         numCards = selectedDeck.getSize()
-        print(f"Número de cartas {numCards}")
         if status == self.DEFINE_BUY_CARD_ACTION and turnPlayer.getId() == localPlayerId and numCards > 0:
             card = selectedDeck.popCard()
-            print(f"Pegou a carta {card.__dict__}")
             turnPlayer.addCard(card)
-            print(f"Mão do jogador {turnPlayer.getName()} agora virou {[card.__dict__ for card in turnPlayer.getCurrentHand()]}")
             self.setStatus(self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION)
+            self.regularMove = True
         else:
             print(f"DEFINE_BUY_CARD_ACTION != {status} ou {localPlayerId} != {turnPlayer.getId()} ou {numCards} <= 0:")
             messagebox.showinfo("Invalid action", "You can't buy a card now")
+            self.regularMove = False
 
     def discard(self):
         turnPlayer = self.identifyTurnPlayer()
@@ -121,15 +117,15 @@ class Table:
                 self.discardDeck.addCardsToDeck(selectedCards)
                 turnPlayer.removeCardsFromHand(selectedCards)
                 self.setStatus(self.DEFINE_OPT_YANIV)
+                self.regularMove = True
             else:
                 messagebox.showinfo("Invalid action", "Invalid move")
+                self.regularMove = False
 
 
     def receiveWithdrawalNotification(self):
         self.setStatus(self.DEFINE_WITHDRAWAL)
         
-
-
     def receiveMove(self, a_move: dict):
         code = a_move["code"]
         if code == "RESET ROUND":
@@ -145,8 +141,6 @@ class Table:
             self.optYaniv(a_move["yanivOpt"])
         if code == "WITHDRAWAL":
             self.receiveWithdrawalNotification()
-        
-        
     
     def optYaniv(self, yanivOpt: bool) -> bool:
         turnPlayer = self.identifyTurnPlayer()
@@ -169,9 +163,11 @@ class Table:
             turnPlayer.toggleTurn()
             self.updatePlayersQueueIndex()
             self.playersQueue[0].toggleTurn()
+            self.regularMove = True
             return match_finished
         else:
             messagebox.showinfo("Invalid action", "Invalid move")
+            self.regularMove = False
             
 
     def distributeCards(self):
@@ -185,19 +181,22 @@ class Table:
         turnPlayer = self.identifyTurnPlayer()
         name = turnPlayer.getName()
         cards = self.discardDeck.getCards()
-        guiImage.setDiscardDeckFirstCard(cards[0])
+        guiImage.setDiscardDeckFirstCard(cards[0] if len(cards) else None)
         lenBuyDeck = self.buyDeck.getSize()
         guiImage.setBuyDeckEmpty(lenBuyDeck == 0)
         playersInfo = []
         for player in self.playersQueue:
             playerHand = player.getCurrentHand()
             id = player.getId()
-            if id == self.getLocalPlayerId(): guiImage.setLocalPlayerCurrentHand(playerHand)
+            if id == self.getLocalPlayerId(): 
+                guiImage.setLocalPlayerCurrentHand(playerHand)
+                for card in playerHand:
+                    print(card.__dict__)
             nCards = len(playerHand)
             points = player.getTotalPoints()
             playerInfo = PlayerInfo(id, nCards, points)
             playersInfo.append(playerInfo)
-        if "regularMove": #EGL 10/06/2024 -> discutir como obter regularMove, provavelmente
+        if self.regularMove: #EGL 10/06/2024 -> discutir como obter regularMove, provavelmente
                           # setar uma variavel membro booleana regularMove e atualizar a cada acao 
             match self.status:
                 case self.DEFINE_NO_MATCH:
@@ -253,15 +252,11 @@ class Table:
         self.setStatus(self.DEFINE_BUY_CARD_ACTION)
         for player in self.playersQueue:
             cards = player.getCurrentHand()
-            print(f"{player.getName()} tinha mão {[card.__dict__ for card in cards]} e foi limpa")
             player.clearHand()
             self.buyDeck.addCardsToDeck(cards)
         discardCards = self.discardDeck.cleanAndReturnCards()
-        print(f"DiscardCards tinha mão {[card.__dict__ for card in discardCards]} e foi limpa")
         self.buyDeck.addCardsToDeck(discardCards)
-        print(f"Mão do buyDeck {[card.__dict__ for card in self.buyDeck.cards]}")
         self.buyDeck.shuffle()
-        print(f"Mão do buyDeck embaralhada {[card.__dict__ for card in self.buyDeck.cards]}")
         self.distributeCards()
 
 
@@ -289,11 +284,13 @@ class Table:
         #self.orderPlayerQueue()
     
     def selectCard(self, cardId: int):
+        print("chegou ", cardId)
         turnPlayer = self.identifyTurnPlayer()
         status = self.getStatus()
         localPlayerId = self.getLocalPlayerId()
         if status == self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION and turnPlayer.getId() == localPlayerId:
             selectedCard = turnPlayer.findSelectedCardById(cardId)
+            print("achou", selectedCard.__dict__)
             selectedCard.toggleSelected()
         else:
             print(f"Status = {status} != 2 ou {turnPlayer.getId()} != {localPlayerId} ")

@@ -22,5 +22,8 @@ class Card:
     def toggleSelected(self):
         self.selected = not self.selected
     
-    def getNumber(self):
+    def getNumber(self) -> int:
         return self.number
+
+    def getId(self) -> int:
+        return self.id

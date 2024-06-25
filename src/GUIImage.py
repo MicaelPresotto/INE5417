@@ -26,7 +26,7 @@ class GUIImage:
     def setPlayersInfo(self, playersInfo: list):
         self.playersInfo = playersInfo.copy()
     
-    def getLocalPlayerCurrentHand(self) -> list:
+    def getLocalPlayerCurrentHand(self) -> list[Card]:
         return self.localPlayerCurrentHand.copy()
 
     def setLocalPlayerCurrentHand(self, cards: list):
