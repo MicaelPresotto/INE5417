@@ -106,6 +106,18 @@ class PlayerInterface(DogPlayerInterface):
 
         self.roundLabel.place(relx=0.85, rely=0.02)
 
+        self.messageLabel = tk.Label(
+            self.mainWindow,
+            text="",
+            bg="darkgreen",
+            font=("Arial", 12),
+            fg="white",
+        )
+
+        self.messageLabel.place(relx=0.42, rely=0.2)
+
+        self.roundLabel.place(relx=0.85, rely=0.02)
+
         self.cardLabels: list[tk.Label] = []
         self.leftPlayerCards: list[tk.Label] = []
         self.rightPlayerCards: list[tk.Label] = []
@@ -319,6 +331,9 @@ class PlayerInterface(DogPlayerInterface):
 
         round = guiImage.getRound()
         self.roundLabel.config(text = f"Round: {round}")
+
+        message = guiImage.getMessage()
+        self.messageLabel.config(text = message)
 
         playersInfo = guiImage.getPlayersInfo()
         for playerInfo in playersInfo:

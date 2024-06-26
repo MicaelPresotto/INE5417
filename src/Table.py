@@ -34,12 +34,11 @@ class Table:
                 player.toggleTurn()
     
     def setPlayersQueue(self, playersQueue: list):
-        self.playersQueue = [Player(p[1], p[0], i+1) for i, p in enumerate(playersQueue)]
+        self.playersQueue = [Player(p[1], p[0]) for p in playersQueue]
 
     def identifyTurnPlayer(self) -> Player:
         for player in self.playersQueue:
             if player.getTurn(): return player
-            print('não é o player da vez')
 
     def getStatus(self) -> int:
         return self.status
@@ -160,7 +159,8 @@ class Table:
             else:
                 self.setStatus(self.DEFINE_WAITING_FOR_REMOTE_ACTION)
             turnPlayer.toggleTurn()
-            self.updatePlayersQueueIndex()
+
+            self.updatePlayersQueue()
             self.playersQueue[0].toggleTurn()
             self.regularMove = True
             return match_finished if yanivOpt else False
@@ -269,8 +269,9 @@ class Table:
         return False
 
 
-    def updatePlayersQueueIndex(self):
-        self.playersQueueIndex = (self.playersQueueIndex + 1) % len(self.playersQueue)
+    def updatePlayersQueue(self):
+        firstPlayer = self.playersQueue.pop(0)
+        self.playersQueue.append(firstPlayer)
 
     def getLocalPlayerId(self) -> str:
         return self.localPlayerId
@@ -282,7 +283,6 @@ class Table:
     def startMatch(self):
         self.resetRound()
         self.toggleTurnById(self.localPlayerId)
-        #self.orderPlayerQueue()
     
     def selectCard(self, cardId: int):
         print("chegou ", cardId)
