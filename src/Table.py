@@ -34,7 +34,7 @@ class Table:
                 player.toggleTurn()
     
     def setPlayersQueue(self, playersQueue: list):
-        self.playersQueue = [Player(p[1], p[0]) for p in playersQueue]
+        self.playersQueue = [Player(p[1], p[0], i+1) for i, p in enumerate(playersQueue)]
 
     def identifyTurnPlayer(self) -> Player:
         for player in self.playersQueue:
@@ -163,10 +163,11 @@ class Table:
             self.updatePlayersQueueIndex()
             self.playersQueue[0].toggleTurn()
             self.regularMove = True
-            return match_finished
+            return match_finished if yanivOpt else False
         else:
             messagebox.showinfo("Invalid action", "Invalid move")
             self.regularMove = False
+            return None
             
 
     def distributeCards(self):
@@ -180,21 +181,22 @@ class Table:
         turnPlayer = self.identifyTurnPlayer()
         name = turnPlayer.getName()
         cards = self.discardDeck.getCards()
-        guiImage.setDiscardDeckFirstCard(cards[0] if len(cards) else None)
+        guiImage.setDiscardDeckFirstCard(cards[-1] if len(cards) else None)
         lenBuyDeck = self.buyDeck.getSize()
         guiImage.setBuyDeckEmpty(lenBuyDeck == 0)
         playersInfo = []
+        guiImage.setRound(self.round)
         for player in self.playersQueue:
             playerHand = player.getCurrentHand()
             id = player.getId()
             if id == self.getLocalPlayerId(): 
                 guiImage.setLocalPlayerCurrentHand(playerHand)
-                for card in playerHand:
-                    print(card.__dict__)
             nCards = len(playerHand)
             points = player.getTotalPoints()
             playerInfo = PlayerInfo(id, nCards, points)
             playersInfo.append(playerInfo)
+        guiImage.setPlayersInfo(playersInfo)
+
         if self.regularMove: #EGL 10/06/2024 -> discutir como obter regularMove, provavelmente
                           # setar uma variavel membro booleana regularMove e atualizar a cada acao 
             match self.status:
@@ -268,7 +270,7 @@ class Table:
 
 
     def updatePlayersQueueIndex(self):
-        self.playersQueueIndex = (self.playersQueueIndex + 1) % len(self.players)
+        self.playersQueueIndex = (self.playersQueueIndex + 1) % len(self.playersQueue)
 
     def getLocalPlayerId(self) -> str:
         return self.localPlayerId

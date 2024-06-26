@@ -90,17 +90,15 @@ class PlayerInterface(DogPlayerInterface):
         buyDeck.place(relx=0.3, rely=0.4)
         buyDeck.bind("<Button-1>", lambda event: self.buyCard(isBuyDeck=True))
 
-        imageDiscardDeck= tk.PhotoImage(file="cards/7C.png")
-        discardDeck= tk.Label(
-            self.mainWindow, image=imageDiscardDeck, bd=0, bg="darkgreen"
+        self.discardDeck= tk.Label(
+            self.mainWindow, image="", bd=0, bg="darkgreen"
         )
-        discardDeck.imagem = imageDiscardDeck
-        discardDeck.place(relx=0.58, rely=0.4)
-        discardDeck.bind("<Button-1>", lambda event: self.buyCard(isBuyDeck=False))
+        self.discardDeck.place(relx=0.58, rely=0.4)
+        self.discardDeck.bind("<Button-1>", lambda event: self.buyCard(isBuyDeck=False))
 
         self.roundLabel = tk.Label(
             self.mainWindow,
-            text="Round: X",
+            text="Round: 0",
             bg="darkgreen",
             font=("Arial", 15),
             fg="white",
@@ -108,8 +106,10 @@ class PlayerInterface(DogPlayerInterface):
 
         self.roundLabel.place(relx=0.85, rely=0.02)
 
-        self.cardLabels : list[tk.Label] = []
-
+        self.cardLabels: list[tk.Label] = []
+        self.leftPlayerCards: list[tk.Label] = []
+        self.rightPlayerCards: list[tk.Label] = []
+        self.topPlayerCards: list[tk.Label] = []
         # bottom
         for i in range(6):
             card = tk.Label(self.mainWindow, bd=0, bg="darkgreen")
@@ -118,27 +118,22 @@ class PlayerInterface(DogPlayerInterface):
 
         # left
         for i in range(5):
-            cardImage = Image.open("cards/backLeft.png")
-            cardImage = ImageTk.PhotoImage(cardImage)
-            w = tk.Label(self.mainWindow, image=cardImage, bd=0, bg="darkgreen")
-            w.image = cardImage
-            w.place(relx=0.02, rely=0.3 + i * 0.07)
+            card = tk.Label(self.mainWindow, bd=0, bg="darkgreen")
+            card.place(relx=0.02, rely=0.3 + i * 0.07)
+            self.leftPlayerCards.append(card)
 
         # right
         for i in range(5):
-            cardImage = Image.open("cards/backRight.png")
-            cardImage = ImageTk.PhotoImage(cardImage)
-            w = tk.Label(self.mainWindow, image=cardImage, bd=0, bg="darkgreen")
-            w.image = cardImage
-            w.place(relx=0.85, rely=0.3 + i * 0.07)
+            card = tk.Label(self.mainWindow, bd=0, bg="darkgreen")
+            card.place(relx=0.85, rely=0.3 + i * 0.07)
+            self.rightPlayerCards.append(card)
+
 
         # top
         for i in range(5):
-            cardImage = Image.open("cards/backUpsideDown.png")
-            cardImage = ImageTk.PhotoImage(cardImage)
-            w = tk.Label(self.mainWindow, image=cardImage, bd=0, bg="darkgreen")
-            w.image = cardImage
-            w.place(relx=0.3 + i * 0.07, rely=0.02)
+            card = tk.Label(self.mainWindow, bd=0, bg="darkgreen")
+            card.place(relx=0.3 + i * 0.07, rely=0.02)
+            self.topPlayerCards.append(card)
 
         frameScorePlayer1 = tk.Frame(
             self.mainWindow,
@@ -261,16 +256,18 @@ class PlayerInterface(DogPlayerInterface):
 
     def optYaniv(self, opt):
         match_finished = self.table.optYaniv(opt)
+        print(f"match_finished: {match_finished} and opt: {opt}")
         # send_move
-        if opt and not match_finished:
-            self.table.setStatus(self.table.DEFINE_FINISHED_ROUND)
-            self.table.resetRound()
-            #send_move
+        if match_finished is not None:
+            if opt and not match_finished:
+                print("entrei")
+                self.table.setStatus(self.table.DEFINE_FINISHED_ROUND)
+                self.table.resetRound()
+                #send_move
         guiImage = self.table.getGUIImage()
         self.updateGui(guiImage)
     
     def startMatch(self):
-        print("Vou start a partida")
         status = self.table.getStatus()
         if status == self.table.DEFINE_NO_MATCH:
             answer = messagebox.askyesno("Start", "Start a new match?")
@@ -309,3 +306,36 @@ class PlayerInterface(DogPlayerInterface):
         for j in range(6 - len(guiImage.getLocalPlayerCurrentHand())):
             cardLabel = self.cardLabels[-(j + 1)]
             cardLabel.config(image = "", borderwidth = 0)
+        
+        topOfDiscardDeck = guiImage.getDiscardDeckFirstCard()
+        if topOfDiscardDeck is not None:
+            cardImage = ImageTk.PhotoImage(Image.open(f"cards/{topOfDiscardDeck.getValue()}{topOfDiscardDeck.getSuit()}.png"))
+            self.discardDeck.config(image = cardImage)
+            self.discardDeck.photo_ref = cardImage
+
+        isBuyDeckEmpty = guiImage.getBuyDeckEmpty()
+        if isBuyDeckEmpty:
+            self.buyDeck.config(image = "")
+
+        round = guiImage.getRound()
+        self.roundLabel.config(text = f"Round: {round}")
+
+        playersInfo = guiImage.getPlayersInfo()
+        for playerInfo in playersInfo:
+            print(playerInfo.__dict__)
+            playerId = playerInfo.getPlayerId()
+            nCards = playerInfo.getNumberOfCards()
+            # nCards vai servir pra setar quantas cartas o jogador adversario tem na mao
+            score = playerInfo.getPoints()
+
+            # o problema de ter aquele ID imenso eh que eu nao sei quem eh quem, podemos criar um atributo pra isso pois precisamos atualizar os pontos de cada
+            # jogador na gui
+            if playerId == 1:
+                self.labelPontuacaoPlayer1.config(text = f"Score: {score}")
+            elif playerId == 2:
+                self.labelPontuacaoPlayer2.config(text = f"Score: {score}")
+            elif playerId == 3:
+                self.labelScorePlayer3.config(text = f"Score: {score}")
+            elif playerId == 4:
+                self.labelScorePlayer4.config(text = f"Score: {score}")
+        

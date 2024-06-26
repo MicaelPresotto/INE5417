@@ -32,4 +32,8 @@ class GUIImage:
     def setLocalPlayerCurrentHand(self, cards: list):
         self.localPlayerCurrentHand = cards.copy()
 
+    def setRound(self, round: int):
+        self.round = round
     
+    def getRound(self) -> int:
+        return self.round
