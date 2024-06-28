@@ -27,3 +27,6 @@ class Card:
 
     def getId(self) -> int:
         return self.id
+    
+    def setSelected(self, selected: bool):
+        self.selected = selected

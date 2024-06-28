@@ -85,11 +85,11 @@ class PlayerInterface(DogPlayerInterface):
         )
         self.dontCallYanivButton.place(relx=0.58, rely=0.7)
 
-        imageBuyDeck= tk.PhotoImage(file="cards/back.png")
-        buyDeck = tk.Label(self.mainWindow, image=imageBuyDeck, bd=0, bg="darkgreen")
-        buyDeck.imagem = imageBuyDeck
-        buyDeck.place(relx=0.3, rely=0.4)
-        buyDeck.bind("<Button-1>", lambda event: self.buyCard(isBuyDeck=True))
+        self.imageBuyDeck= tk.PhotoImage(file="cards/back.png")
+        self.buyDeck = tk.Label(self.mainWindow, image=self.imageBuyDeck, bd=0, bg="darkgreen")
+        self.buyDeck.imagem = self.imageBuyDeck
+        self.buyDeck.place(relx=0.3, rely=0.4)
+        self.buyDeck.bind("<Button-1>", lambda event: self.buyCard(isBuyDeck=True))
 
         self.discardDeck= tk.Label(
             self.mainWindow, image="", bd=0, bg="darkgreen"
@@ -239,46 +239,118 @@ class PlayerInterface(DogPlayerInterface):
         self.menuFile.add_command(label="Exit", command=self.onClickExit)
 
     def buyCard(self, isBuyDeck):
-        self.table.buyCard(isBuyDeck)
-        #send move
-        guiImage = self.table.getGUIImage()
-        self.updateGui(guiImage)
+        status = self.table.getStatus()
+        turnPlayer = self.table.identifyTurnPlayer()
+        localPlayerId = self.table.getLocalPlayerId()
+        numCards = self.table.buyDeck.getSize()
+        if status == self.table.DEFINE_BUY_CARD_ACTION and turnPlayer.getId() == localPlayerId and numCards > 0:
+            self.table.buyCard(isBuyDeck)
+            move_to_send = {
+                "match_status": "next",
+                "code": "BUY CARD",
+                "isBuyDeck": isBuyDeck
+            }
+            self.dogActor.send_move(move_to_send)
+            guiImage = self.table.getGUIImage()
+            self.updateGui(guiImage)
+        elif turnPlayer.getId() != localPlayerId:
+            messagebox.showinfo("Erro ao comprar", "Não é sua vez de comprar")
+        elif numCards == 0:
+            messagebox.showinfo("Erro ao comprar", "Baralho de compra vazio")
+        else:
+            messagebox.showinfo("Erro ao comprar", "Não é hora de comprar")
 
     def discard(self):
-        self.table.discard()
-        #send move
-        guiImage = self.table.getGUIImage()
-        self.updateGui(guiImage)
+        status = self.table.getStatus()
+        turnPlayer = self.table.identifyTurnPlayer()
+        localPlayerId = self.table.getLocalPlayerId()
+        if status == self.table.DEFINE_DISCARD_OR_SELECT_CARD_ACTION and turnPlayer.getId() == localPlayerId:
+            self.table.discard()
+            move_to_send = {
+                "match_status": "next",
+                "code": "DISCARD"
+            }
+            self.dogActor.send_move(move_to_send)
+            guiImage = self.table.getGUIImage()
+            self.updateGui(guiImage)
+        elif turnPlayer.getId() != localPlayerId:
+            messagebox.showinfo("Erro ao descartar", "Não é sua vez de descartar")
+        else:
+            messagebox.showinfo("Erro ao descartar", "Não é hora de descartar")
 
     def selectCard(self, cardId):
-        self.table.selectCard(cardId)
-        guiImage = self.table.getGUIImage()
-        self.updateGui(guiImage)
+        status = self.table.getStatus()
+        turnPlayer = self.table.identifyTurnPlayer()
+        localPlayerId = self.table.getLocalPlayerId()
+        if status == self.table.DEFINE_DISCARD_OR_SELECT_CARD_ACTION and turnPlayer.getId() == localPlayerId:
+            self.table.selectCard(cardId)
+            guiImage = self.table.getGUIImage()
+            self.updateGui(guiImage)
+        elif turnPlayer.getId() != localPlayerId:
+            messagebox.showinfo("Erro ao selecionar carta", "Não é sua vez de selecionar carta")
+        else:
+            messagebox.showinfo("Erro ao selecionar carta", "Não é hora de selecionar carta")
 
     def onClickRules(self):
         messagebox.showinfo("Rules", "Rules clicked")
 
     def onClickReset(self):
-        self.table.resetGame()
-        # send_move
-        guiImage = self.table.getGUIImage()
-        self.updateGui(guiImage)
+        status = self.table.getStatus()
+        if status == self.table.DEFINE_FINISHED_MATCH or status == self.table.DEFINE_WITHDRAWAL:
+            self.table.resetGame()
+            move_to_send = {}
+            self.dogActor.send_move(move_to_send)
+            guiImage = self.table.getGUIImage()
+            self.updateGui(guiImage)
+        else:
+            messagebox.showinfo("Erro ao resetar", "Não é possível resetar")
 
     def onClickExit(self):
         messagebox.showinfo("Exit", "Exit clicked")
 
     def optYaniv(self, opt):
-        match_finished = self.table.optYaniv(opt)
-        print(f"match_finished: {match_finished} and opt: {opt}")
-        # send_move
-        if match_finished is not None:
+        status = self.table.getStatus()
+        turnPlayer = self.table.identifyTurnPlayer()
+        localPlayerId = self.table.getLocalPlayerId()
+        if status == self.table.DEFINE_OPT_YANIV and turnPlayer.getId() == localPlayerId:
+            match_finished = self.table.optYaniv(opt)
+            print(f"match_finished: {match_finished} and opt: {opt}")
+            move_to_send = {
+                "match_status": "next",
+                "code": "OPT YANIV",
+                "opt": opt,
+            }
+            self.dogActor.send_move(move_to_send)
             if opt and not match_finished:
-                print("entrei")
                 self.table.setStatus(self.table.DEFINE_FINISHED_ROUND)
+                tk.messagebox.showinfo("Round finished", "Round finished")
                 self.table.resetRound()
-                #send_move
-        guiImage = self.table.getGUIImage()
-        self.updateGui(guiImage)
+                playersQueue = self.table.getPlayersQueue()
+                localPlayerId = self.table.getLocalPlayerId()
+                hands = {}
+                for player in playersQueue:
+                    hands[player.getId()] = player.getCurrentHand()
+                move_to_send = {
+                    "match_status": "next",
+                    "code": "RESET ROUND",
+                    "hands": hands,
+                    "buyDeck": self.table.buyDeck.getCards(),
+                    "discardDeck": self.table.discardDeck.getCards(),
+                }
+                self.dogActor.send_move(move_to_send)
+            elif opt and match_finished:
+                self.table.setStatus(self.table.DEFINE_FINISHED_MATCH)
+                tk.messagebox.showinfo("Match finished", "Match finished")
+                move_to_send = {
+                    "match_status": "finished"
+                }
+                self.dogActor.send_move(move_to_send)
+            guiImage = self.table.getGUIImage()
+            self.updateGui(guiImage)
+        elif turnPlayer.getId() != localPlayerId:
+            messagebox.showinfo("Erro ao chamar yaniv", "Não é sua vez de optar por yaniv")
+        else:
+            messagebox.showinfo("Erro ao chamar yaniv", "Não é hora de optar por yaniv")
     
     def startMatch(self):
         status = self.table.getStatus()
@@ -296,13 +368,26 @@ class PlayerInterface(DogPlayerInterface):
                     self.table.setPlayersQueue(players)
                     self.table.setLocalPlayerId(localPlayerId)
                     self.table.startMatch()
-                # send_move
+                hands = {}
+                for player in self.table.getPlayersQueue():
+                    hands[player.getId()] = player.getCurrentHand()
+                move_to_send = {
+                    "match_status": "next",
+                    "code": "RESET ROUND",
+                    "hands": hands,
+                    "buyDeck": self.table.buyDeck.getCards(),
+                    "discardDeck": self.table.discardDeck.getCards(),
+                }
+                # fazer conversao do obj carta pra .__dict__ e fazer o inverso tambem
+                self.dogActor.send_move(move_to_send)
                 guiImage = self.table.getGUIImage()
                 self.updateGui(guiImage)
         else:
             messagebox.showinfo("Erro ao iniciar partida", "Partida já iniciada")
 
     def receive_move(self, a_move):
+        print("teste")
+        # TODO: ver pq o remoto nao ta recebendo o movimento
         self.table.receiveMove(a_move)
         guiImage = self.table.getGUIImage()
         self.updateGui(guiImage)
@@ -329,10 +414,15 @@ class PlayerInterface(DogPlayerInterface):
             cardImage = ImageTk.PhotoImage(Image.open(f"cards/{topOfDiscardDeck.getValue()}{topOfDiscardDeck.getSuit()}.png"))
             self.discardDeck.config(image = cardImage)
             self.discardDeck.photo_ref = cardImage
+        else:
+            self.discardDeck.config(image = "")
 
         isBuyDeckEmpty = guiImage.getBuyDeckEmpty()
         if isBuyDeckEmpty:
             self.buyDeck.config(image = "")
+        else:
+            self.buyDeck.config(image = self.imageBuyDeck)
+            self.buyDeck.photo_ref = self.imageBuyDeck
 
         round = guiImage.getRound()
         self.roundLabel.config(text = f"Round: {round}")
