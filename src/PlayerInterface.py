@@ -5,6 +5,7 @@ from dog.dog_actor import DogActor
 from dog.dog_interface import DogPlayerInterface
 from Table import Table
 from GUIImage import GUIImage
+from utils import NUMBER_OF_PLAYERS
 
 class PlayerInterface(DogPlayerInterface):
     def __init__(self):
@@ -118,34 +119,34 @@ class PlayerInterface(DogPlayerInterface):
 
         self.roundLabel.place(relx=0.85, rely=0.02)
 
-        self.cardLabels: list[tk.Label] = []
-        self.leftPlayerCards: list[tk.Label] = []
-        self.rightPlayerCards: list[tk.Label] = []
-        self.topPlayerCards: list[tk.Label] = []
+        self.player1Cards: list[tk.Label] = []
+        self.player2Cards: list[tk.Label] = []
+        self.player3Cards: list[tk.Label] = []
+        self.player4Cards: list[tk.Label] = []
         # bottom
         for i in range(6):
             card = tk.Label(self.mainWindow, bd=0, bg="darkgreen")
             card.place(relx=0.25 + i * 0.07, rely=0.8)
-            self.cardLabels.append(card)
+            self.player1Cards.append(card)
 
         # left
-        for i in range(5):
+        for i in range(6):
             card = tk.Label(self.mainWindow, bd=0, bg="darkgreen")
             card.place(relx=0.02, rely=0.3 + i * 0.07)
-            self.leftPlayerCards.append(card)
+            self.player4Cards.append(card)
 
         # right
-        for i in range(5):
+        for i in range(6):
             card = tk.Label(self.mainWindow, bd=0, bg="darkgreen")
             card.place(relx=0.85, rely=0.3 + i * 0.07)
-            self.rightPlayerCards.append(card)
+            self.player2Cards.append(card)
 
 
         # top
-        for i in range(5):
+        for i in range(6):
             card = tk.Label(self.mainWindow, bd=0, bg="darkgreen")
             card.place(relx=0.3 + i * 0.07, rely=0.02)
-            self.topPlayerCards.append(card)
+            self.player3Cards.append(card)
 
         frameScorePlayer1 = tk.Frame(
             self.mainWindow,
@@ -199,10 +200,10 @@ class PlayerInterface(DogPlayerInterface):
             frameScorePlayer3, text="Player 3", bg="white", font=("Arial", 8)
         )
         self.labelPlayer3.place(relx=0.33, rely=0.01)
-        self.labelScorePlayer3 = tk.Label(
+        self.labelPontuacaoPlayer3 = tk.Label(
             frameScorePlayer3, text="Score: 0", bg="white", font=("Arial", 8)
         )
-        self.labelScorePlayer3.place(relx=0.32, rely=0.5)
+        self.labelPontuacaoPlayer3.place(relx=0.32, rely=0.5)
 
         frameScorePlayer4 = tk.Frame(
             self.mainWindow,
@@ -218,10 +219,10 @@ class PlayerInterface(DogPlayerInterface):
             frameScorePlayer4, text="Player 4", bg="white", font=("Arial", 8)
         )
         self.labelPlayer4.place(relx=0.33, rely=0.01)
-        self.labelScorePlayer4 = tk.Label(
+        self.labelPontuacaoPlayer4 = tk.Label(
             frameScorePlayer4, text="Score: 0", bg="white", font=("Arial", 8)
         )
-        self.labelScorePlayer4.place(relx=0.32, rely=0.5)
+        self.labelPontuacaoPlayer4.place(relx=0.32, rely=0.5)
 
     def createMenu(self):
         self.menu = tk.Menu(self.mainWindow)
@@ -284,7 +285,7 @@ class PlayerInterface(DogPlayerInterface):
         if status == self.table.DEFINE_NO_MATCH:
             answer = messagebox.askyesno("Start", "Start a new match?")
             if answer:
-                startStatus = self.dogActor.start_match(2)
+                startStatus = self.dogActor.start_match(NUMBER_OF_PLAYERS)
                 code = startStatus.get_code()
                 message = startStatus.get_message()
                 if code == "0" or code == "1":
@@ -307,16 +308,20 @@ class PlayerInterface(DogPlayerInterface):
         self.updateGui(guiImage)
                 
     def updateGui(self, guiImage: GUIImage):
+        # função lambda para selecionar uma carta
         select_card = lambda x: (lambda p: self.selectCard(x))
+        # para cada carta na mão do jogador
         for i, card in enumerate(guiImage.getLocalPlayerCurrentHand()):
-            cardLabel = self.cardLabels[i]
+            cardLabel = self.player1Cards[i]
+            # obtem a imagem correspondente
             cardImage = ImageTk.PhotoImage(Image.open(f"cards/{card.getValue()}{card.getSuit()}.png"))
-            cardLabel.config(image = cardImage, borderwidth= 2 if card.isSelected() else 0, relief="solid")
+            # deixa com borda se ta selecionada
+            cardLabel.config(image = cardImage, borderwidth = 2 if card.isSelected() else 0, relief="solid")
             cardLabel.photo_ref = cardImage
             cardLabel.bind("<Button-1>", select_card(card.getId()))
-
+        # limpa as "restantes"
         for j in range(6 - len(guiImage.getLocalPlayerCurrentHand())):
-            cardLabel = self.cardLabels[-(j + 1)]
+            cardLabel = self.player1Cards[-(j + 1)]
             cardLabel.config(image = "", borderwidth = 0)
         
         topOfDiscardDeck = guiImage.getDiscardDeckFirstCard()
@@ -336,21 +341,27 @@ class PlayerInterface(DogPlayerInterface):
         self.messageLabel.config(text = message)
 
         playersInfo = guiImage.getPlayersInfo()
-        for playerInfo in playersInfo:
-            print(playerInfo.__dict__)
-            playerId = playerInfo.getPlayerId()
-            nCards = playerInfo.getNumberOfCards()
-            # nCards vai servir pra setar quantas cartas o jogador adversario tem na mao
-            score = playerInfo.getPoints()
 
-            # o problema de ter aquele ID imenso eh que eu nao sei quem eh quem, podemos criar um atributo pra isso pois precisamos atualizar os pontos de cada
-            # jogador na gui
-            if playerId == 1:
-                self.labelPontuacaoPlayer1.config(text = f"Score: {score}")
-            elif playerId == 2:
-                self.labelPontuacaoPlayer2.config(text = f"Score: {score}")
-            elif playerId == 3:
-                self.labelScorePlayer3.config(text = f"Score: {score}")
-            elif playerId == 4:
-                self.labelScorePlayer4.config(text = f"Score: {score}")
-        
+        i = self.table.getPlayerIndexById(self.table.getLocalPlayerId())
+
+        self.labelPontuacaoPlayer1.config(text = f"Score: {playersInfo[self.table.getLocalPlayerId()].getPoints()}")
+
+        if NUMBER_OF_PLAYERS == 4:
+            pontuacao = [self.labelPontuacaoPlayer2, self.labelPontuacaoPlayer3, self.labelPontuacaoPlayer4]
+            cards = [self.player2Cards, self.player3Cards, self.player4Cards]
+            cards_images = ["backRight", "backUpsideDown", "backLeft"]
+        elif NUMBER_OF_PLAYERS == 2:
+            pontuacao = [self.labelPontuacaoPlayer2]
+            cards = [self.player2Cards]
+            cards_images = ["backRight"]
+
+        playersQueue = self.table.getPlayersQueue()
+        for j in range(len(pontuacao)):
+            playerInfo = playersInfo[playersQueue[(i+j+1) % NUMBER_OF_PLAYERS].getId()]
+            pontuacao[j].config(text = f"Score: {playerInfo.getPoints()}")
+            for m in range(playerInfo.getNumberOfCards()):
+                img = ImageTk.PhotoImage(Image.open(f"cards/{cards_images[j]}.png"))
+                cards[j][m].config(image = img)
+                cards[j][m].photo_ref = img
+            for n in range(6 - playerInfo.getNumberOfCards()):
+                cards[j][-(n+1)].config(image = "")
