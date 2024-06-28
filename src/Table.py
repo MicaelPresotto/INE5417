@@ -1,3 +1,4 @@
+import json
 from Player import Player
 from DiscardDeck import DiscardDeck
 from BuyDeck import BuyDeck
@@ -5,6 +6,7 @@ from GUIImage import GUIImage
 from PlayerInfo import PlayerInfo
 from tkinter import messagebox
 
+from Card import Card
 from utils import NUMBER_OF_PLAYERS
 class Table:
     def __init__(self):
@@ -114,9 +116,13 @@ class Table:
         code = a_move["code"]
         if code == "RESET ROUND":
             for player in self.playersQueue:
-                player.setCurrentHand(a_move[f"hands"][player.getId()])
-            self.discardDeck.setCards(a_move["discardDeck"])
-            self.buyDeck.setCards(a_move["buyDeck"])
+                # precisa desfaeer a desirealizacao
+                hands = json.loads(a_move[f"hands"][player.getId()])
+                hands_restored = [Card(card["id"], card["value"], card["suit"], card["points"], card["number"]) for card in hands]
+                player.setCurrentHand(hands_restored)
+            discardDeck = json.loads(a_move["discardDeck"])
+            self.discardDeck.setCards(json.loads(a_move["discardDeck"]))
+            self.buyDeck.setCards(json.loads(a_move["buyDeck"]))
         if code == "BUY CARD":
             self.buyCard()
         if code == "DISCARD":
