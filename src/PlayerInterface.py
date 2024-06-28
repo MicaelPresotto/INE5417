@@ -1,3 +1,4 @@
+import json
 import tkinter as tk
 from tkinter import messagebox, simpledialog
 from PIL import Image, ImageTk
@@ -330,12 +331,13 @@ class PlayerInterface(DogPlayerInterface):
                 hands = {}
                 for player in playersQueue:
                     hands[player.getId()] = player.getCurrentHand()
+                hands_serializable = {playerId: [card.__dict__ for card in hand] for playerId, hand in hands.items()}
                 move_to_send = {
                     "match_status": "next",
                     "code": "RESET ROUND",
-                    "hands": hands,
-                    "buyDeck": self.table.buyDeck.getCards(),
-                    "discardDeck": self.table.discardDeck.getCards(),
+                    "hands": json.dumps(hands_serializable),
+                    "buyDeck": json.dumps([card.__dict__ for card in self.table.buyDeck.getCards()]),
+                    "discardDeck": json.dumps([card.__dict__ for card in self.table.discardDeck.getCards()]),
                 }
                 self.dogActor.send_move(move_to_send)
             elif opt and match_finished:
@@ -371,12 +373,14 @@ class PlayerInterface(DogPlayerInterface):
                 hands = {}
                 for player in self.table.getPlayersQueue():
                     hands[player.getId()] = player.getCurrentHand()
+
+                hands_serializable = {playerId: [card.__dict__ for card in hand] for playerId, hand in hands.items()}
                 move_to_send = {
                     "match_status": "next",
                     "code": "RESET ROUND",
-                    "hands": hands,
-                    "buyDeck": self.table.buyDeck.getCards(),
-                    "discardDeck": self.table.discardDeck.getCards(),
+                    "hands": json.dumps(hands_serializable),
+                    "buyDeck": json.dumps([card.__dict__ for card in self.table.buyDeck.getCards()]),
+                    "discardDeck": json.dumps([card.__dict__ for card in self.table.discardDeck.getCards()]),
                 }
                 # fazer conversao do obj carta pra .__dict__ e fazer o inverso tambem
                 self.dogActor.send_move(move_to_send)
@@ -384,10 +388,9 @@ class PlayerInterface(DogPlayerInterface):
                 self.updateGui(guiImage)
         else:
             messagebox.showinfo("Erro ao iniciar partida", "Partida já iniciada")
-
+    
+    
     def receive_move(self, a_move):
-        print("teste")
-        # TODO: ver pq o remoto nao ta recebendo o movimento
         self.table.receiveMove(a_move)
         guiImage = self.table.getGUIImage()
         self.updateGui(guiImage)
@@ -455,3 +458,4 @@ class PlayerInterface(DogPlayerInterface):
                 cards[j][m].photo_ref = img
             for n in range(6 - playerInfo.getNumberOfCards()):
                 cards[j][-(n+1)].config(image = "")
+
