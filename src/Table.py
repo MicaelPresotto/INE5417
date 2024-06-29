@@ -168,7 +168,7 @@ class Table:
         if code == "WITHDRAWAL":
             self.receiveWithdrawalNotification()
         #TODO: testar
-        if "match_status" in a_move and a_move["match_status"] == "finished":
+        if a_move["match_status"] == "finished":
             self.playersQueue = []
             for p in json.loads(a_move["playersQueue"]):
                 id = p["id"]
@@ -226,8 +226,8 @@ class Table:
                 guiImage.setLocalPlayerCurrentHand(playerHand)
             nCards = len(playerHand)
             points = player.getTotalPoints()
-            playerInfo = PlayerInfo(id, nCards, points)
-            playersInfo[id] = playerInfo
+            pName = player.getName()
+            playersInfo[id] = PlayerInfo(pName, id, nCards, points)
         guiImage.setPlayersInfo(playersInfo)
         match self.getStatus():
             case self.DEFINE_NO_MATCH:
@@ -264,8 +264,8 @@ class Table:
         self.resetRound()
         self.round = 0
         turnPlayer.toggleTurn()
-        indexPlayer = self.updatePlayersQueueIndex()
-        self.playersQueue[indexPlayer].toggleTurn()
+        self.updatePlayersQueueIndex()
+        self.playersQueue[self.playersQueueIndex].toggleTurn()
 
 
     def resetRound(self):

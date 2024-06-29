@@ -496,12 +496,15 @@ class PlayerInterface(DogPlayerInterface):
         i = self.table.getPlayerIndexById(self.table.getLocalPlayerId())
 
         self.labelPontuacaoPlayer1.config(text = f"Score: {playersInfo[self.table.getLocalPlayerId()].getPoints()}")
+        self.labelPlayer1.config(text = playersInfo[self.table.getLocalPlayerId()].getPlayerName())
 
         if NUMBER_OF_PLAYERS == 4:
+            nomes = [self.labelPlayer2, self.labelPlayer3, self.labelPlayer4]
             pontuacao = [self.labelPontuacaoPlayer2, self.labelPontuacaoPlayer3, self.labelPontuacaoPlayer4]
             cards = [self.player2Cards, self.player3Cards, self.player4Cards]
             cards_images = ["backRight", "backUpsideDown", "backLeft"]
         elif NUMBER_OF_PLAYERS == 2:
+            nomes = [self.labelPlayer2]
             pontuacao = [self.labelPontuacaoPlayer2]
             cards = [self.player2Cards]
             cards_images = ["backRight"]
@@ -510,6 +513,7 @@ class PlayerInterface(DogPlayerInterface):
         for j in range(len(pontuacao)):
             playerInfo = playersInfo[playersQueue[(i+j+1) % NUMBER_OF_PLAYERS].getId()]
             pontuacao[j].config(text = f"Score: {playerInfo.getPoints()}")
+            nomes[j].config(text = playerInfo.getPlayerName())
             for m in range(playerInfo.getNumberOfCards()):
                 img = ImageTk.PhotoImage(Image.open(f"cards/{cards_images[j]}.png"))
                 cards[j][m].config(image = img)
