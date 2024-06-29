@@ -332,7 +332,7 @@ class PlayerInterface(DogPlayerInterface):
             messagebox.showinfo("Erro ao resetar", "Não é possível resetar")
 
     def onClickExit(self):
-        messagebox.showinfo("Exit", "Exit clicked")
+        self.mainWindow.destroy()
 
     def optYaniv(self, opt):
         status = self.table.getStatus()
