@@ -38,6 +38,7 @@ class PlayerInterface(DogPlayerInterface):
             messagebox.showinfo("Problema", start_status.message)
             return
         messagebox.showinfo("Start", start_status.message)
+        self.table.setLocalPlayerId(start_status.local_id)
 
     def createWidgets(self):
         self.buyLabel = tk.Label(
@@ -249,7 +250,7 @@ class PlayerInterface(DogPlayerInterface):
         if status == self.table.DEFINE_BUY_CARD_ACTION and turnPlayer.getId() == localPlayerId and numCards > 0:
             self.table.buyCard(isBuyDeck)
             move_to_send = {
-                "match_status": "next",
+                "match_status": "progress",
                 "code": "BUY CARD",
                 "isBuyDeck": isBuyDeck
             }
@@ -268,10 +269,11 @@ class PlayerInterface(DogPlayerInterface):
         turnPlayer = self.table.identifyTurnPlayer()
         localPlayerId = self.table.getLocalPlayerId()
         if status == self.table.DEFINE_DISCARD_OR_SELECT_CARD_ACTION and turnPlayer.getId() == localPlayerId:
-            self.table.discard()
+            selected_cards = self.table.discard()
             move_to_send = {
-                "match_status": "next",
-                "code": "DISCARD"
+                "match_status": "progress",
+                "code": "DISCARD",
+                "selected_cards" : json.dumps([card.getId() for card in selected_cards]),
             }
             self.dogActor.send_move(move_to_send)
             guiImage = self.table.getGUIImage()
@@ -319,7 +321,7 @@ class PlayerInterface(DogPlayerInterface):
             match_finished = self.table.optYaniv(opt)
             print(f"match_finished: {match_finished} and opt: {opt}")
             move_to_send = {
-                "match_status": "next",
+                "match_status": "progress",
                 "code": "OPT YANIV",
                 "opt": opt,
             }
@@ -341,14 +343,13 @@ class PlayerInterface(DogPlayerInterface):
                     "buyDeck": json.dumps([card.__dict__ for card in self.table.buyDeck.getCards()]),
                     "discardDeck": json.dumps([card.__dict__ for card in self.table.discardDeck.getCards()]),
                 }
-                self.dogActor.send_move(move_to_send)
             elif opt and match_finished:
                 self.table.setStatus(self.table.DEFINE_FINISHED_MATCH)
                 tk.messagebox.showinfo("Match finished", "Match finished")
                 move_to_send = {
                     "match_status": "finished"
                 }
-                self.dogActor.send_move(move_to_send)
+            self.dogActor.send_move(move_to_send)
             guiImage = self.table.getGUIImage()
             self.updateGui(guiImage)
         elif turnPlayer.getId() != localPlayerId:
@@ -374,13 +375,12 @@ class PlayerInterface(DogPlayerInterface):
                     self.table.startMatch()
                 hands = {}
                 for player in self.table.getPlayersQueue():
-                    print(player.__dict__)
                     hands[player.getId()] = player.getCurrentHand()
 
                 hands_serializable = {playerId: [card.__dict__ for card in hand] for playerId, hand in hands.items()}
                     
                 move_to_send = {
-                    "match_status": "next",
+                    "match_status": "progress",
                     "code": "RESET ROUND",
                     "hands": json.dumps(hands_serializable),
                     "buyDeck": json.dumps([card.__dict__ for card in self.table.buyDeck.getCards()]),
@@ -396,6 +396,7 @@ class PlayerInterface(DogPlayerInterface):
     def convertToJson(self, obj):
         if isinstance(obj, (Card, Player)):
             return obj.__dict__
+
     def receive_move(self, a_move):
         self.table.receiveMove(a_move)
         guiImage = self.table.getGUIImage()
@@ -464,4 +465,3 @@ class PlayerInterface(DogPlayerInterface):
                 cards[j][m].photo_ref = img
             for n in range(6 - playerInfo.getNumberOfCards()):
                 cards[j][-(n+1)].config(image = "")
-

@@ -11,8 +11,7 @@ class Deck:
         return len(self.cards)
 
     def addCardsToDeck(self, cards: list):
-        for card in cards:
-            card.setSelected(False)
+        for card in cards: card.setSelected(False)
         self.cards.extend(cards.copy())
     
     def setCards(self, cards: list):

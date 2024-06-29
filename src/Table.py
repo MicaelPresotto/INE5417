@@ -108,13 +108,14 @@ class Table:
             turnPlayer.removeCardsFromHand(selectedCards)
             self.setStatus(self.DEFINE_OPT_YANIV)
             self.regularMove = True
+        return selectedCards
 
     def receiveWithdrawalNotification(self):
         self.setStatus(self.DEFINE_WITHDRAWAL)
         
     def receiveMove(self, a_move: dict):
         code = a_move["code"].upper()
-        if a_move["playersQueue"]:
+        if "playersQueue" in a_move:
             for p in json.loads(a_move["playersQueue"]):
                 id = p["id"]
                 name = p["name"]
@@ -123,22 +124,27 @@ class Table:
                 totalPoints = p["totalPoints"]
                 player = Player(id, name)
                 player.setTurn(turn)
-                player.setIsWinner(isWinner)
+                player.setWinner(isWinner)
                 player.setTotalPoints(totalPoints)
                 self.playersQueue.append(player)
-        for player in self.playersQueue:
-            print(player.__dict__)
         if code == "RESET ROUND":
+            playersHands = json.loads(a_move['hands'])
             for player in self.playersQueue:
-                playersHands = json.loads(a_move['hands'])
                 playerHand = playersHands[player.getId()]
                 hands_restored = [Card(card["id"], card["value"], card["suit"], card["points"], card["number"]) for card in playerHand]
                 player.setCurrentHand(hands_restored)
-            self.discardDeck.setCards(json.loads(a_move["discardDeck"]))
-            self.buyDeck.setCards(json.loads(a_move["buyDeck"]))
+            self.discardDeck.setCards([Card(card["id"], card["value"], card["suit"], card["points"], card["number"]) for card in json.loads(a_move["discardDeck"])])
+            self.buyDeck.setCards([Card(card["id"], card["value"], card["suit"], card["points"], card["number"]) for card in json.loads(a_move["buyDeck"])])
         if code == "BUY CARD":
-            self.buyCard()
+            self.buyCard(a_move["isBuyDeck"])
         if code == "DISCARD":
+            selected_cards = json.loads(a_move["selected_cards"])
+            print(selected_cards)
+            turnPlayerCurrentHand = self.identifyTurnPlayer().getCurrentHand()
+            for card in turnPlayerCurrentHand:
+                if card.getId() in selected_cards:
+                    print("entrou")
+                    card.setSelected(True)
             self.discard()
         if code == "YANIV":
             self.optYaniv(a_move["yanivOpt"])
@@ -165,6 +171,7 @@ class Table:
 
         self.updatePlayersQueueIndex()
         self.playersQueue[self.playersQueueIndex].toggleTurn()
+        for p in self.playersQueue: print(f"nome - {p.getName()} vez - {p.getTurn()}")
         self.regularMove = True
         return match_finished if yanivOpt else False
             
@@ -263,7 +270,7 @@ class Table:
     
     def getWinner(self) -> Player:
         for player in self.playersQueue:
-            if player.getIsWinner(): return player
+            if player.isWinner(): return player
     
     def startMatch(self):
         self.resetRound()
