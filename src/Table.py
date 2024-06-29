@@ -113,14 +113,27 @@ class Table:
         self.setStatus(self.DEFINE_WITHDRAWAL)
         
     def receiveMove(self, a_move: dict):
-        code = a_move["code"]
+        code = a_move["code"].upper()
+        if a_move["playersQueue"]:
+            for p in json.loads(a_move["playersQueue"]):
+                id = p["id"]
+                name = p["name"]
+                turn = p["turn"]
+                isWinner = p["isWinner"]
+                totalPoints = p["totalPoints"]
+                player = Player(id, name)
+                player.setTurn(turn)
+                player.setIsWinner(isWinner)
+                player.setTotalPoints(totalPoints)
+                self.playersQueue.append(player)
+        for player in self.playersQueue:
+            print(player.__dict__)
         if code == "RESET ROUND":
             for player in self.playersQueue:
-                # precisa desfaeer a desirealizacao
-                hands = json.loads(a_move[f"hands"][player.getId()])
-                hands_restored = [Card(card["id"], card["value"], card["suit"], card["points"], card["number"]) for card in hands]
+                playersHands = json.loads(a_move['hands'])
+                playerHand = playersHands[player.getId()]
+                hands_restored = [Card(card["id"], card["value"], card["suit"], card["points"], card["number"]) for card in playerHand]
                 player.setCurrentHand(hands_restored)
-            discardDeck = json.loads(a_move["discardDeck"])
             self.discardDeck.setCards(json.loads(a_move["discardDeck"]))
             self.buyDeck.setCards(json.loads(a_move["buyDeck"]))
         if code == "BUY CARD":
@@ -224,6 +237,7 @@ class Table:
 
 
     def resetRound(self):
+        self.round += 1
         self.setStatus(self.DEFINE_BUY_CARD_ACTION)
         for player in self.playersQueue:
             cards = player.getCurrentHand()

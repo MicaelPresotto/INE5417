@@ -63,6 +63,9 @@ class Player:
         
     def getTurn(self) -> bool:
         return self.turn
+    
+    def setTurn(self, turn: bool):
+        self.turn = turn
 
     def getName(self) -> str:
         return self.name

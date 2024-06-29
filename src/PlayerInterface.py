@@ -6,6 +6,8 @@ from dog.dog_actor import DogActor
 from dog.dog_interface import DogPlayerInterface
 from Table import Table
 from GUIImage import GUIImage
+from Player import Player
+from Card import Card
 from utils import NUMBER_OF_PLAYERS
 
 class PlayerInterface(DogPlayerInterface):
@@ -372,24 +374,28 @@ class PlayerInterface(DogPlayerInterface):
                     self.table.startMatch()
                 hands = {}
                 for player in self.table.getPlayersQueue():
+                    print(player.__dict__)
                     hands[player.getId()] = player.getCurrentHand()
 
                 hands_serializable = {playerId: [card.__dict__ for card in hand] for playerId, hand in hands.items()}
+                    
                 move_to_send = {
                     "match_status": "next",
                     "code": "RESET ROUND",
                     "hands": json.dumps(hands_serializable),
                     "buyDeck": json.dumps([card.__dict__ for card in self.table.buyDeck.getCards()]),
                     "discardDeck": json.dumps([card.__dict__ for card in self.table.discardDeck.getCards()]),
+                    "playersQueue": json.dumps(self.table.getPlayersQueue(),  default=self.convertToJson),
                 }
-                # fazer conversao do obj carta pra .__dict__ e fazer o inverso tambem
                 self.dogActor.send_move(move_to_send)
                 guiImage = self.table.getGUIImage()
                 self.updateGui(guiImage)
         else:
             messagebox.showinfo("Erro ao iniciar partida", "Partida já iniciada")
     
-    
+    def convertToJson(self, obj):
+        if isinstance(obj, (Card, Player)):
+            return obj.__dict__
     def receive_move(self, a_move):
         self.table.receiveMove(a_move)
         guiImage = self.table.getGUIImage()
