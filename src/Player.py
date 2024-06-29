@@ -13,7 +13,6 @@ class Player:
         self.currentHand.append(card)
 
     def getSelectedCards(self) -> list:
-        print(f"getSelectedCards: {self.currentHand}")
         return [card for card in self.currentHand if card.isSelected()]
 
     def removeCardsFromHand(self, cards: list):

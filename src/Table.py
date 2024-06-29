@@ -18,7 +18,6 @@ class Table:
         self.status = 0
         self.playersQueueIndex = 0
         self.localPlayerId = ""
-        self.regularMove = True
 
         self.DEFINE_NO_MATCH = 0
         self.DEFINE_BUY_CARD_ACTION = 1
@@ -37,6 +36,12 @@ class Table:
             if player.getId() == id:
                 player.toggleTurn()
     
+    def setPlayersQueueIndex(self, index: int):
+        self.playersQueueIndex = index
+
+    def getPlayerQueueIndex(self) -> int:
+        return self.playersQueueIndex
+    
     def setPlayersQueue(self, playersQueue: list):
         self.playersQueue = [Player(p[1], p[0]) for p in playersQueue]
 
@@ -49,6 +54,9 @@ class Table:
 
     def setStatus(self, status: int):
         self.status = status
+
+    def getRound(self) -> int:
+        return self.round
 
     def isSet(self, cards : list) -> bool:
         s = set()
@@ -63,7 +71,8 @@ class Table:
             if cards[i].getValue() == "Joker" or cards[i-1].getValue() == "Joker": continue
             if cards[i].getSuit() != cards[i-1].getSuit(): return False
 
-        values = [card.getNumber() for card in cards].sort()
+        values = [card.getNumber() for card in cards]
+        values.sort()
         # contador de coringas
         countJokers = 0
         for i in range(1, len(values)):
@@ -91,14 +100,11 @@ class Table:
         
         card = selectedDeck.popCard()
         turnPlayer.addCard(card)
-        self.setStatus(self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION)
-        self.regularMove = True
 
     def discard(self):
         turnPlayer = self.identifyTurnPlayer()
         selectedCards = turnPlayer.getSelectedCards()
         if len(selectedCards) == 0:
-            messagebox.showinfo("Selecione uma carta", "Selecione pelo menos uma carta")
             return False
         is_sequence = False
         if len(selectedCards) >= 2: is_set = self.isSet(selectedCards)
@@ -106,15 +112,16 @@ class Table:
         if len(selectedCards) == 1 or is_set or is_sequence:
             self.discardDeck.addCardsToDeck(selectedCards)
             turnPlayer.removeCardsFromHand(selectedCards)
-            self.setStatus(self.DEFINE_OPT_YANIV)
-            self.regularMove = True
-        return selectedCards
+            return True
+        return False
 
     def receiveWithdrawalNotification(self):
         self.setStatus(self.DEFINE_WITHDRAWAL)
         
     def receiveMove(self, a_move: dict):
-        code = a_move["code"].upper()
+        code = ""
+        if "code" in a_move: 
+            code = a_move["code"].upper()
         if "playersQueue" in a_move:
             for p in json.loads(a_move["playersQueue"]):
                 id = p["id"]
@@ -128,33 +135,45 @@ class Table:
                 player.setTotalPoints(totalPoints)
                 self.playersQueue.append(player)
         if code == "RESET ROUND":
+            self.round = json.loads(a_move["round"])
             playersHands = json.loads(a_move['hands'])
             for player in self.playersQueue:
                 playerHand = playersHands[player.getId()]
                 hands_restored = [Card(card["id"], card["value"], card["suit"], card["points"], card["number"]) for card in playerHand]
                 player.setCurrentHand(hands_restored)
+            turnPlayer = self.identifyTurnPlayer()
+            if turnPlayer.getId() == self.getLocalPlayerId():
+                self.setStatus(self.DEFINE_BUY_CARD_ACTION)
+            else:
+                self.setStatus(self.DEFINE_WAITING_FOR_REMOTE_ACTION)
             self.discardDeck.setCards([Card(card["id"], card["value"], card["suit"], card["points"], card["number"]) for card in json.loads(a_move["discardDeck"])])
             self.buyDeck.setCards([Card(card["id"], card["value"], card["suit"], card["points"], card["number"]) for card in json.loads(a_move["buyDeck"])])
+            if "playersQueueIndex" in a_move:
+                self.setPlayersQueueIndex(json.loads(a_move["playersQueueIndex"]))
         if code == "BUY CARD":
             self.buyCard(a_move["isBuyDeck"])
         if code == "DISCARD":
             selected_cards = json.loads(a_move["selected_cards"])
-            print(selected_cards)
             turnPlayerCurrentHand = self.identifyTurnPlayer().getCurrentHand()
             for card in turnPlayerCurrentHand:
                 if card.getId() in selected_cards:
-                    print("entrou")
                     card.setSelected(True)
             self.discard()
-        if code == "YANIV":
-            self.optYaniv(a_move["yanivOpt"])
+        if code == "OPT YANIV":
+            self.optYaniv(a_move["opt"])
+            turnPlayer = self.identifyTurnPlayer()
+            if turnPlayer.getId() == self.getLocalPlayerId():
+                self.setStatus(self.DEFINE_BUY_CARD_ACTION)
         if code == "WITHDRAWAL":
             self.receiveWithdrawalNotification()
+        if "match_status" in a_move and a_move["match_status"] == "FINISHED":
+            self.setStatus(self.DEFINE_FINISHED_MATCH)
+
 
     
     def optYaniv(self, yanivOpt: bool) -> bool:
         turnPlayer = self.identifyTurnPlayer()
-        totalPoints = turnPlayer.getTotalPoints()
+        totalPoints = sum([card.getPoints() for card in turnPlayer.getCurrentHand()])
         if yanivOpt:
             if totalPoints <= 6:
                 isLowest = turnPlayer.checkIfLowestHand(self.playersQueue)
@@ -163,16 +182,11 @@ class Table:
             if totalPoints > 6 or not isLowest:
                 turnPlayer.updateTotalPoints(30)
             match_finished = self.verifyEndOfMatch()
-            if match_finished:
-                self.setStatus(self.DEFINE_FINISHED_MATCH)
-        else:
-            self.setStatus(self.DEFINE_WAITING_FOR_REMOTE_ACTION)
+            
         turnPlayer.toggleTurn()
 
         self.updatePlayersQueueIndex()
         self.playersQueue[self.playersQueueIndex].toggleTurn()
-        for p in self.playersQueue: print(f"nome - {p.getName()} vez - {p.getTurn()}")
-        self.regularMove = True
         return match_finished if yanivOpt else False
             
     def distributeCards(self):
@@ -201,35 +215,31 @@ class Table:
             playerInfo = PlayerInfo(id, nCards, points)
             playersInfo[id] = playerInfo
         guiImage.setPlayersInfo(playersInfo)
+        match self.getStatus():
+            case self.DEFINE_NO_MATCH:
+                message = "Start a match in the menu"
+            case self.DEFINE_BUY_CARD_ACTION:
+                message = name + " must buy a card"
+            case self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION:
+                message = name + " must discard"
+            case self.DEFINE_OPT_YANIV:
+                message = name + " must opt for yaniv"
+            case self.DEFINE_WAITING_FOR_REMOTE_ACTION:
+                message = "Turn player: " + name
+            case self.DEFINE_FINISHED_MATCH:
+                winner = self.getWinner()
+                message = "Winner: " + winner.getName()
+            case self.DEFINE_WITHDRAWAL:
+                message = "Match abandonned by oponnent"
+            case self.DEFINE_FINISHED_ROUND:
+                message = "Round finished!"
 
-        if self.regularMove: #EGL 10/06/2024 -> discutir como obter regularMove, provavelmente
-                          # setar uma variavel membro booleana regularMove e atualizar a cada acao 
-            match self.status:
-                case self.DEFINE_NO_MATCH:
-                    message = "Start a match in the menu"
-                case self.DEFINE_BUY_CARD_ACTION:
-                    message = name + " must buy a card"
-                case self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION:
-                    message = name + " must discard"
-                case self.DEFINE_OPT_YANIV:
-                    message = name + " must opt for yaniv"
-                case self.DEFINE_WAITING_FOR_REMOTE_ACTION:
-                    message = "Turn player: " + name
-                case self.DEFINE_FINISHED_MATCH:
-                    winner = self.getWinner()
-                    message = "Winner: " + winner
-                case self.DEFINE_WITHDRAWAL:
-                    message = "Match abandonned by oponnent"
-                case self.DEFINE_FINISHED_ROUND:
-                    message = "Round finished!"
-        else:
-            message = "Irregular move"
         guiImage.setMessage(message)
         return guiImage
     
     def applyPenaltyToOtherPlayers(self):
         for player in self.playersQueue:
-            if player.getTurn == False:
+            if not player.getTurn():
                 player.updateTotalPoints(10)
 
     def resetGame(self):
@@ -245,7 +255,6 @@ class Table:
 
     def resetRound(self):
         self.round += 1
-        self.setStatus(self.DEFINE_BUY_CARD_ACTION)
         for player in self.playersQueue:
             cards = player.getCurrentHand()
             player.clearHand()
