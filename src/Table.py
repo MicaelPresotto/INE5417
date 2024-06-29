@@ -119,6 +119,7 @@ class Table:
         self.setStatus(self.DEFINE_WITHDRAWAL)
         
     def receiveMove(self, a_move: dict):
+        print(a_move)
         code = ""
         if "code" in a_move: 
             code = a_move["code"].upper()
@@ -127,7 +128,7 @@ class Table:
                 id = p["id"]
                 name = p["name"]
                 turn = p["turn"]
-                isWinner = p["isWinner"]
+                isWinner = p["winner"]
                 totalPoints = p["totalPoints"]
                 player = Player(id, name)
                 player.setTurn(turn)
@@ -166,7 +167,20 @@ class Table:
                 self.setStatus(self.DEFINE_BUY_CARD_ACTION)
         if code == "WITHDRAWAL":
             self.receiveWithdrawalNotification()
-        if "match_status" in a_move and a_move["match_status"] == "FINISHED":
+        #TODO: testar
+        if "match_status" in a_move and a_move["match_status"] == "finished":
+            self.playersQueue = []
+            for p in json.loads(a_move["playersQueue"]):
+                id = p["id"]
+                name = p["name"]
+                turn = p["turn"]
+                isWinner = p["winner"]
+                totalPoints = p["totalPoints"]
+                player = Player(id, name)
+                player.setTurn(turn)
+                player.setWinner(isWinner)
+                player.setTotalPoints(totalPoints)
+                self.playersQueue.append(player)
             self.setStatus(self.DEFINE_FINISHED_MATCH)
 
 
@@ -241,16 +255,17 @@ class Table:
         for player in self.playersQueue:
             if not player.getTurn():
                 player.updateTotalPoints(10)
-
+    #TODO: nao esta funcionando ainda
     def resetGame(self):
         turnPlayer = self.identifyTurnPlayer()
         for player in self.playersQueue:
             player.setTotalPoints(0)
             player.setWinner(False)
         self.resetRound()
+        self.round = 0
         turnPlayer.toggleTurn()
-        self.updatePlayersQueueIndex()
-        self.playersQueue[0].toggleTurn()
+        indexPlayer = self.updatePlayersQueueIndex()
+        self.playersQueue[indexPlayer].toggleTurn()
 
 
     def resetRound(self):

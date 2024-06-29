@@ -7,7 +7,7 @@ class Player:
         self.turn = False
         self.totalPoints = 0
         self.currentHand = []
-        self.isWinner = False
+        self.winner = False
 
     def addCard(self, card: Card):
         self.currentHand.append(card)
