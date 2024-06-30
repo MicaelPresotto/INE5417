@@ -310,27 +310,6 @@ class PlayerInterface(DogPlayerInterface):
     def onClickReset(self):
         status = self.table.getStatus()
         if status == self.table.DEFINE_FINISHED_MATCH or status == self.table.DEFINE_WITHDRAWAL:
-        #     self.table.resetGame()
-        #     playersQueue = self.table.getPlayersQueue()
-        #     hands = {}
-        #     for player in playersQueue:
-        #         hands[player.getId()] = player.getCurrentHand()
-        #     hands_serializable = {playerId: [card.__dict__ for card in hand] for playerId, hand in hands.items()}
-        #     move_to_send = {
-        #         "match_status": "next",
-        #         "code": "RESET GAME",
-        #         "fromYaniv": False,
-        #         "hands": json.dumps(hands_serializable),
-        #         "buyDeck": json.dumps([card.__dict__ for card in self.table.buyDeck.getCards()]),
-        #         "discardDeck": json.dumps([card.__dict__ for card in self.table.discardDeck.getCards()]),
-        #         "round": json.dumps(self.table.getRound()),
-        #     }
-        #     self.dogActor.send_move(move_to_send)
-        #     self.table.setStatus(self.table.DEFINE_BUY_CARD_ACTION)
-        #     guiImage = self.table.getGUIImage()
-        #     self.updateGui(guiImage)
-        # else:
-        #     messagebox.showinfo("Erro ao resetar", "Não é possível resetar")
             self.table.resetGame()
             self.startMatch()
 
@@ -453,6 +432,11 @@ class PlayerInterface(DogPlayerInterface):
         if "match_status" in a_move and a_move["match_status"] == "finished":
             messagebox.showinfo("Match finished", "Match finished")
         self.table.receiveMove(a_move)
+        guiImage = self.table.getGUIImage()
+        self.updateGui(guiImage)
+
+    def receive_withdrawal_notification(self):
+        self.table.setStatus(self.table.DEFINE_WITHDRAWAL)
         guiImage = self.table.getGUIImage()
         self.updateGui(guiImage)
                 

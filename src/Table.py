@@ -115,8 +115,8 @@ class Table:
             return True
         return False
 
-    def receiveWithdrawalNotification(self):
-        self.setStatus(self.DEFINE_WITHDRAWAL)
+    # def receiveWithdrawalNotification(self):
+    #     self.setStatus(self.DEFINE_WITHDRAWAL)
         
     def receiveMove(self, a_move: dict):
         code = ""
