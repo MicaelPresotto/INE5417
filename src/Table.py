@@ -4,7 +4,7 @@ from DiscardDeck import DiscardDeck
 from BuyDeck import BuyDeck
 from GUIImage import GUIImage
 from PlayerInfo import PlayerInfo
-from tkinter import messagebox
+from utils import POINTS_TO_END_A_MATCH
 
 from Card import Card
 from utils import NUMBER_OF_PLAYERS
@@ -163,6 +163,8 @@ class Table:
         if code == "OPT YANIV":
             self.optYaniv(a_move["opt"])
             turnPlayer = self.identifyTurnPlayer()
+            # Se o novo jogador da vez é o player remoto que recebeu a jogada do opt yaniv
+            # seu status deve se tornar buy card action
             if turnPlayer.getId() == self.getLocalPlayerId():
                 self.setStatus(self.DEFINE_BUY_CARD_ACTION)
         if code == "WITHDRAWAL":
@@ -170,6 +172,7 @@ class Table:
         #TODO: testar
         if a_move["match_status"] == "finished":
             self.playersQueue = []
+            playersHands = json.loads(a_move['hands'])
             for p in json.loads(a_move["playersQueue"]):
                 id = p["id"]
                 name = p["name"]
@@ -181,6 +184,9 @@ class Table:
                 player.setWinner(isWinner)
                 player.setTotalPoints(totalPoints)
                 self.playersQueue.append(player)
+                playerHand = playersHands[id]
+                hands_restored = [Card(card["id"], card["value"], card["suit"], card["points"], card["number"]) for card in playerHand]
+                player.setCurrentHand(hands_restored)
             self.setStatus(self.DEFINE_FINISHED_MATCH)
 
 
@@ -262,11 +268,10 @@ class Table:
             player.setTotalPoints(0)
             player.setWinner(False)
         self.resetRound()
-        self.round = 0
+        self.round = 1
         turnPlayer.toggleTurn()
         self.updatePlayersQueueIndex()
         self.playersQueue[self.playersQueueIndex].toggleTurn()
-
 
     def resetRound(self):
         self.round += 1
@@ -280,7 +285,7 @@ class Table:
         self.distributeCards()
 
     def verifyEndOfMatch(self) -> bool:
-        MAXSCORE = 100
+        MAXSCORE = POINTS_TO_END_A_MATCH
         for player in self.playersQueue:
             if player.getTotalPoints() >= MAXSCORE:
                 return True

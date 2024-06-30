@@ -309,27 +309,28 @@ class PlayerInterface(DogPlayerInterface):
     def onClickReset(self):
         status = self.table.getStatus()
         if status == self.table.DEFINE_FINISHED_MATCH or status == self.table.DEFINE_WITHDRAWAL:
-            self.table.resetGame()
-            playersQueue = self.table.getPlayersQueue()
-            hands = {}
-            for player in playersQueue:
-                hands[player.getId()] = player.getCurrentHand()
-            hands_serializable = {playerId: [card.__dict__ for card in hand] for playerId, hand in hands.items()}
-            move_to_send = {
-                "match_status": "next",
-                "code": "RESET ROUND",
-                "fromYaniv": False,
-                "hands": json.dumps(hands_serializable),
-                "buyDeck": json.dumps([card.__dict__ for card in self.table.buyDeck.getCards()]),
-                "discardDeck": json.dumps([card.__dict__ for card in self.table.discardDeck.getCards()]),
-                "round": json.dumps(self.table.getRound()),
-            }
-            self.dogActor.send_move(move_to_send)
-            self.table.setStatus(self.table.DEFINE_BUY_CARD_ACTION)
-            guiImage = self.table.getGUIImage()
-            self.updateGui(guiImage)
-        else:
-            messagebox.showinfo("Erro ao resetar", "Não é possível resetar")
+        #     self.table.resetGame()
+        #     playersQueue = self.table.getPlayersQueue()
+        #     hands = {}
+        #     for player in playersQueue:
+        #         hands[player.getId()] = player.getCurrentHand()
+        #     hands_serializable = {playerId: [card.__dict__ for card in hand] for playerId, hand in hands.items()}
+        #     move_to_send = {
+        #         "match_status": "next",
+        #         "code": "RESET GAME",
+        #         "fromYaniv": False,
+        #         "hands": json.dumps(hands_serializable),
+        #         "buyDeck": json.dumps([card.__dict__ for card in self.table.buyDeck.getCards()]),
+        #         "discardDeck": json.dumps([card.__dict__ for card in self.table.discardDeck.getCards()]),
+        #         "round": json.dumps(self.table.getRound()),
+        #     }
+        #     self.dogActor.send_move(move_to_send)
+        #     self.table.setStatus(self.table.DEFINE_BUY_CARD_ACTION)
+        #     guiImage = self.table.getGUIImage()
+        #     self.updateGui(guiImage)
+        # else:
+        #     messagebox.showinfo("Erro ao resetar", "Não é possível resetar")
+            self.startMatch()
 
     def onClickExit(self):
         self.mainWindow.destroy()
@@ -359,8 +360,10 @@ class PlayerInterface(DogPlayerInterface):
                     "match_status": "next",
                     "code": "RESET ROUND",
                     "hands": json.dumps(hands_serializable),
-                    "buyDeck": json.dumps([card.__dict__ for card in self.table.buyDeck.getCards()]),
-                    "discardDeck": json.dumps([card.__dict__ for card in self.table.discardDeck.getCards()]),
+                    # "buyDeck": json.dumps([card.__dict__ for card in self.table.buyDeck.getCards()]),
+                    # "discardDeck": json.dumps([card.__dict__ for card in self.table.discardDeck.getCards()]),
+                    "buyDeck": json.dumps(self.table.buyDeck.getCards(), default=self.convertToJson),
+                    "discardDeck": json.dumps(self.table.discardDeck.getCards(), default=self.convertToJson),
                     "round": json.dumps(self.table.getRound()),
                     "fromYaniv": True,
                 }
@@ -374,16 +377,15 @@ class PlayerInterface(DogPlayerInterface):
                 for player in self.table.getPlayersQueue():
                     if player.getTotalPoints() == min(pontosJogadores):
                         player.setWinner(True)
-                moreThanOneWinner = []
-                for player in self.table.getPlayersQueue():
-                    if player.isWinner():
-                        moreThanOneWinner.append(player)
-                if len(moreThanOneWinner) > 1:
-                    moreThanOneWinner = moreThanOneWinner[1:]
-                    for player in moreThanOneWinner:
-                        player.setWinner(False)
+                        break
+                playersQueue = self.table.getPlayersQueue()
+                hands = {}
+                for player in playersQueue:
+                    hands[player.getId()] = player.getCurrentHand()
+                hands_serializable = {playerId: [card.__dict__ for card in hand] for playerId, hand in hands.items()}
                 move_to_send = {
                     "match_status": "finished",
+                    "hands": json.dumps(hands_serializable),
                     "playersQueue": json.dumps(self.table.getPlayersQueue(),  default=self.convertToJson),
                 }
                 self.dogActor.send_move(move_to_send)
@@ -398,7 +400,7 @@ class PlayerInterface(DogPlayerInterface):
     
     def startMatch(self):
         status = self.table.getStatus()
-        if status == self.table.DEFINE_NO_MATCH:
+        if status in (self.table.DEFINE_FINISHED_MATCH, self.table.DEFINE_NO_MATCH, self.table.DEFINE_WITHDRAWAL):
             answer = messagebox.askyesno("Start", "Start a new match?")
             if answer:
                 startStatus = self.dogActor.start_match(NUMBER_OF_PLAYERS)
