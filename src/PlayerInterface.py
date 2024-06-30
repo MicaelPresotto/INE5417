@@ -28,8 +28,7 @@ class PlayerInterface(DogPlayerInterface):
         playerName = simpledialog.askstring("Player name", "Enter your name")
         msg = self.dogActor.initialize(playerName, self)
         messagebox.showinfo("Connection", msg)
-        if msg == "Conectado a Dog Server":
-            return
+        if msg == "Conectado a Dog Server": return
         exit()
 
     def receive_start(self, start_status):
@@ -42,52 +41,19 @@ class PlayerInterface(DogPlayerInterface):
         self.table.setLocalPlayerId(start_status.local_id)
 
     def createWidgets(self):
-        self.buyLabel = tk.Label(
-            self.mainWindow,
-            text="Buy deck",
-            bg="darkgreen",
-            font=("Arial", 15),
-            fg="white",
-        )
-        self.discardLabel = tk.Label(
-            self.mainWindow,
-            text="Discard deck",
-            bg="darkgreen",
-            font=("Arial", 15),
-            fg="white",
-        )
+        self.buyLabel = tk.Label( self.mainWindow, text="Buy deck", bg="darkgreen", font=("Arial", 15), fg="white")
         self.buyLabel.place(relx=0.29, rely=0.34)
+        
+        self.discardLabel = tk.Label( self.mainWindow, text="Discard deck", bg="darkgreen", font=("Arial", 15), fg="white")
         self.discardLabel.place(relx=0.55, rely=0.34)
 
-        self.discardButton = tk.Button(
-            self.mainWindow,
-            text="Discard",
-            command=self.discard,
-            width=10,
-            height=2,
-            bg="white",
-        )
+        self.discardButton = tk.Button( self.mainWindow, text="Discard", command=self.discard, width=10, height=2, bg="white")
         self.discardButton.place(relx=0.44, rely=0.6)
 
-        self.callYanivButton = tk.Button(
-            self.mainWindow,
-            text="Call yaniv",
-            command = lambda : self.optYaniv(True),
-            width=10,
-            height=2,
-            bg="white",
-        )
-
+        self.callYanivButton = tk.Button( self.mainWindow, text="Call yaniv", command = lambda : self.optYaniv(True), width=10, height=2, bg="white")
         self.callYanivButton.place(relx=0.3, rely=0.7)
 
-        self.dontCallYanivButton = tk.Button(
-            self.mainWindow,
-            text="Don't call yaniv",
-            command= lambda : self.optYaniv(False),
-            width=12,
-            height=2,
-            bg="white",
-        )
+        self.dontCallYanivButton = tk.Button( self.mainWindow, text="Don't call yaniv", command= lambda : self.optYaniv(False), width=12, height=2, bg="white")
         self.dontCallYanivButton.place(relx=0.58, rely=0.7)
 
         self.imageBuyDeck= tk.PhotoImage(file="cards/back.png")
@@ -96,137 +62,69 @@ class PlayerInterface(DogPlayerInterface):
         self.buyDeck.place(relx=0.3, rely=0.4)
         self.buyDeck.bind("<Button-1>", lambda event: self.buyCard(isBuyDeck=True))
 
-        self.discardDeck= tk.Label(
-            self.mainWindow, image="", bd=0, bg="darkgreen"
-        )
+        self.discardDeck= tk.Label(self.mainWindow, image="", bd=0, bg="darkgreen")
         self.discardDeck.place(relx=0.58, rely=0.4)
         self.discardDeck.bind("<Button-1>", lambda event: self.buyCard(isBuyDeck=False))
 
-        self.roundLabel = tk.Label(
-            self.mainWindow,
-            text="Round: 0",
-            bg="darkgreen",
-            font=("Arial", 15),
-            fg="white",
-        )
-
+        self.roundLabel = tk.Label( self.mainWindow, text="Round: 0", bg="darkgreen", font=("Arial", 15), fg="white")
         self.roundLabel.place(relx=0.85, rely=0.02)
 
-        self.messageLabel = tk.Label(
-            self.mainWindow,
-            text="",
-            bg="darkgreen",
-            font=("Arial", 12),
-            fg="white",
-        )
-
+        self.messageLabel = tk.Label( self.mainWindow, text="", bg="darkgreen", font=("Arial", 12), fg="white")
         self.messageLabel.place(relx=0.42, rely=0.2)
 
-        self.roundLabel.place(relx=0.85, rely=0.02)
-
-        self.player1Cards: list[tk.Label] = []
-        self.player2Cards: list[tk.Label] = []
-        self.player3Cards: list[tk.Label] = []
-        self.player4Cards: list[tk.Label] = []
-        # bottom
+        self.player1Cards, self.player2Cards, self.player3Cards, self.player4Cards = [],[],[],[]
+        
         for i in range(6):
             card = tk.Label(self.mainWindow, bd=0, bg="darkgreen")
             card.place(relx=0.25 + i * 0.07, rely=0.8)
             self.player1Cards.append(card)
 
-        # left
-        for i in range(6):
-            card = tk.Label(self.mainWindow, bd=0, bg="darkgreen")
-            card.place(relx=0.02, rely=0.3 + i * 0.07)
-            self.player4Cards.append(card)
+            card2 = tk.Label(self.mainWindow, bd=0, bg="darkgreen")
+            card2.place(relx=0.85, rely=0.3 + i * 0.07)
+            self.player2Cards.append(card2)
 
-        # right
-        for i in range(6):
-            card = tk.Label(self.mainWindow, bd=0, bg="darkgreen")
-            card.place(relx=0.85, rely=0.3 + i * 0.07)
-            self.player2Cards.append(card)
+            card3 = tk.Label(self.mainWindow, bd=0, bg="darkgreen")
+            card3.place(relx=0.3 + i * 0.07, rely=0.02)
+            self.player3Cards.append(card3)
+            
+            card4 = tk.Label(self.mainWindow, bd=0, bg="darkgreen")
+            card4.place(relx=0.02, rely=0.3 + i * 0.07)
+            self.player4Cards.append(card4)
 
-
-        # top
-        for i in range(6):
-            card = tk.Label(self.mainWindow, bd=0, bg="darkgreen")
-            card.place(relx=0.3 + i * 0.07, rely=0.02)
-            self.player3Cards.append(card)
-
-        frameScorePlayer1 = tk.Frame(
-            self.mainWindow,
-            bg="white",
-            bd=1,
-            borderwidth=2,
-            highlightbackground="black",
-            highlightcolor="black",
-            highlightthickness=1,
-        )
+        frameScorePlayer1 = tk.Frame( self.mainWindow, bg="white", bd=1, borderwidth=2, highlightbackground="black", highlightcolor="black", highlightthickness=1)
         frameScorePlayer1.place(relx=0.7, rely=0.9, relwidth=0.15, relheight=0.07)
-        self.labelPlayer1 = tk.Label(
-            frameScorePlayer1, text="Player 1", bg="white", font=("Arial", 8)
-        )
+        
+        self.labelPlayer1 = tk.Label(frameScorePlayer1, text="Player 1", bg="white", font=("Arial", 8))
         self.labelPlayer1.place(relx=0.33, rely=0.01)
-        self.labelPontuacaoPlayer1 = tk.Label(
-            frameScorePlayer1, text="Score: 0", bg="white", font=("Arial", 8)
-        )
+        
+        self.labelPontuacaoPlayer1 = tk.Label(frameScorePlayer1, text="Score: 0", bg="white", font=("Arial", 8))
         self.labelPontuacaoPlayer1.place(relx=0.32, rely=0.5)
 
-        frameScorePlayer2 = tk.Frame(
-            self.mainWindow,
-            bg="white",
-            bd=1,
-            borderwidth=2,
-            highlightbackground="black",
-            highlightcolor="black",
-            highlightthickness=1,
-        )
+        frameScorePlayer2 = tk.Frame( self.mainWindow, bg="white", bd=1, borderwidth=2, highlightbackground="black", highlightcolor="black", highlightthickness=1)
         frameScorePlayer2.place(relx=0.84, rely=0.2, relwidth=0.15, relheight=0.07)
-        self.labelPlayer2 = tk.Label(
-            frameScorePlayer2, text="Player 2", bg="white", font=("Arial", 8)
-        )
+
+        self.labelPlayer2 = tk.Label(frameScorePlayer2, text="Player 2", bg="white", font=("Arial", 8))
         self.labelPlayer2.place(relx=0.33, rely=0.01)
-        self.labelPontuacaoPlayer2 = tk.Label(
-            frameScorePlayer2, text="Score: 0", bg="white", font=("Arial", 8)
-        )
+        
+        self.labelPontuacaoPlayer2 = tk.Label(frameScorePlayer2, text="Score: 0", bg="white", font=("Arial", 8))
         self.labelPontuacaoPlayer2.place(relx=0.32, rely=0.5)
 
-        frameScorePlayer3 = tk.Frame(
-            self.mainWindow,
-            bg="white",
-            bd=1,
-            borderwidth=2,
-            highlightbackground="black",
-            highlightcolor="black",
-            highlightthickness=1,
-        )
+        frameScorePlayer3 = tk.Frame( self.mainWindow, bg="white", bd=1, borderwidth=2, highlightbackground="black", highlightcolor="black", highlightthickness=1)
         frameScorePlayer3.place(relx=0.12, rely=0.05, relwidth=0.15, relheight=0.07)
-        self.labelPlayer3 = tk.Label(
-            frameScorePlayer3, text="Player 3", bg="white", font=("Arial", 8)
-        )
+
+        self.labelPlayer3 = tk.Label(frameScorePlayer3, text="Player 3", bg="white", font=("Arial", 8))
         self.labelPlayer3.place(relx=0.33, rely=0.01)
-        self.labelPontuacaoPlayer3 = tk.Label(
-            frameScorePlayer3, text="Score: 0", bg="white", font=("Arial", 8)
-        )
+
+        self.labelPontuacaoPlayer3 = tk.Label(frameScorePlayer3, text="Score: 0", bg="white", font=("Arial", 8))
         self.labelPontuacaoPlayer3.place(relx=0.32, rely=0.5)
 
-        frameScorePlayer4 = tk.Frame(
-            self.mainWindow,
-            bg="white",
-            bd=1,
-            borderwidth=2,
-            highlightbackground="black",
-            highlightcolor="black",
-            highlightthickness=1,
-        )
+        frameScorePlayer4 = tk.Frame( self.mainWindow, bg="white", bd=1, borderwidth=2, highlightbackground="black", highlightcolor="black", highlightthickness=1)
         frameScorePlayer4.place(relx=0.02, rely=0.72, relwidth=0.15, relheight=0.07)
-        self.labelPlayer4 = tk.Label(
-            frameScorePlayer4, text="Player 4", bg="white", font=("Arial", 8)
-        )
+
+        self.labelPlayer4 = tk.Label(frameScorePlayer4, text="Player 4", bg="white", font=("Arial", 8))
         self.labelPlayer4.place(relx=0.33, rely=0.01)
-        self.labelPontuacaoPlayer4 = tk.Label(
-            frameScorePlayer4, text="Score: 0", bg="white", font=("Arial", 8)
-        )
+
+        self.labelPontuacaoPlayer4 = tk.Label(frameScorePlayer4, text="Score: 0", bg="white", font=("Arial", 8))
         self.labelPontuacaoPlayer4.place(relx=0.32, rely=0.5)
 
     def createMenu(self):
@@ -285,10 +183,8 @@ class PlayerInterface(DogPlayerInterface):
             self.table.setStatus(self.table.DEFINE_OPT_YANIV)
             guiImage = self.table.getGUIImage()
             self.updateGui(guiImage)
-        elif turnPlayer.getId() != localPlayerId:
-            messagebox.showinfo("Erro ao descartar", "Não é sua vez de descartar")
-        else:
-            messagebox.showinfo("Erro ao descartar", "Não é hora de descartar")
+        elif turnPlayer.getId() != localPlayerId: messagebox.showinfo("Erro ao descartar", "Não é sua vez de descartar")
+        else: messagebox.showinfo("Erro ao descartar", "Não é hora de descartar")
         
 
     def selectCard(self, cardId):
@@ -299,10 +195,8 @@ class PlayerInterface(DogPlayerInterface):
             self.table.selectCard(cardId)
             guiImage = self.table.getGUIImage()
             self.updateGui(guiImage)
-        elif turnPlayer.getId() != localPlayerId:
-            messagebox.showinfo("Erro ao selecionar carta", "Não é sua vez de selecionar carta")
-        else:
-            messagebox.showinfo("Erro ao selecionar carta", "Não é hora de selecionar carta")
+        elif turnPlayer.getId() != localPlayerId: messagebox.showinfo("Erro ao selecionar carta", "Não é sua vez de selecionar carta")
+        else: messagebox.showinfo("Erro ao selecionar carta", "Não é hora de selecionar carta")
 
     def onClickRules(self):
         messagebox.showinfo("Rules", "Rules clicked")
@@ -312,8 +206,7 @@ class PlayerInterface(DogPlayerInterface):
         if status == self.table.DEFINE_FINISHED_MATCH or status == self.table.DEFINE_WITHDRAWAL:
             self.table.resetGame()
             self.startMatch()
-        else:
-            messagebox.showinfo("Erro ao resetar partida", "Partida já iniciada")
+        else: messagebox.showinfo("Erro ao resetar partida", "Partida já iniciada")
 
     def onClickExit(self):
         self.mainWindow.destroy()
@@ -351,7 +244,6 @@ class PlayerInterface(DogPlayerInterface):
             elif opt and match_finished:
                 self.table.setStatus(self.table.DEFINE_FINISHED_MATCH)
                 tk.messagebox.showinfo("Match finished", "Match finished")
-                # fazer logica de ver quem eh o ganhador
                 pontosJogadores = [player.getTotalPoints() for player in self.table.getPlayersQueue()]
                 for player in self.table.getPlayersQueue():
                     if player.getTotalPoints() == min(pontosJogadores):
@@ -366,14 +258,11 @@ class PlayerInterface(DogPlayerInterface):
                     "playersQueue": json.dumps(self.table.getPlayersQueue(),  default=self.convertToJson),
                 }
                 self.dogActor.send_move(move_to_send)
-            elif not opt and not match_finished:
-                self.table.setStatus(self.table.DEFINE_WAITING_FOR_REMOTE_ACTION)
+            elif not opt and not match_finished: self.table.setStatus(self.table.DEFINE_WAITING_FOR_REMOTE_ACTION)
             guiImage = self.table.getGUIImage()
             self.updateGui(guiImage)
-        elif turnPlayer.getId() != localPlayerId:
-            messagebox.showinfo("Erro ao chamar yaniv", "Não é sua vez de optar por yaniv")
-        else:
-            messagebox.showinfo("Erro ao chamar yaniv", "Não é hora de optar por yaniv")
+        elif turnPlayer.getId() != localPlayerId: messagebox.showinfo("Erro ao chamar yaniv", "Não é sua vez de optar por yaniv")
+        else: messagebox.showinfo("Erro ao chamar yaniv", "Não é hora de optar por yaniv")
     
     def startMatch(self):
         status = self.table.getStatus()
@@ -383,7 +272,6 @@ class PlayerInterface(DogPlayerInterface):
                 startStatus = self.dogActor.start_match(NUMBER_OF_PLAYERS)
                 code = startStatus.get_code()
                 message = startStatus.get_message()
-                print(code)
                 if code == "0" or code == "1":
                     messagebox.showinfo("Dog error", message)
                 elif code == "2":
@@ -412,8 +300,7 @@ class PlayerInterface(DogPlayerInterface):
                     self.table.setStatus(self.table.DEFINE_BUY_CARD_ACTION)
                     guiImage = self.table.getGUIImage()
                     self.updateGui(guiImage)
-        else:
-            messagebox.showinfo("Erro ao iniciar partida", "Partida já iniciada")
+        else: messagebox.showinfo("Erro ao iniciar partida", "Partida já iniciada")
     
     def convertToJson(self, obj):
         if isinstance(obj, (Card, Player)):
@@ -421,10 +308,8 @@ class PlayerInterface(DogPlayerInterface):
 
     def receive_move(self, a_move):
         if "code" in a_move and a_move["code"] == "RESET ROUND":
-            if a_move["fromYaniv"]:
-                messagebox.showinfo("Round finished", "Round finished")
-            elif a_move["match_status"] == "finished":
-                messagebox.showinfo("Match finished", "Match finished")
+            if a_move["fromYaniv"]: messagebox.showinfo("Round finished", "Round finished")
+            elif a_move["match_status"] == "finished": messagebox.showinfo("Match finished", "Match finished")
         self.table.receiveMove(a_move)
         guiImage = self.table.getGUIImage()
         self.updateGui(guiImage)
@@ -435,18 +320,13 @@ class PlayerInterface(DogPlayerInterface):
         self.updateGui(guiImage)
                 
     def updateGui(self, guiImage: GUIImage):
-        # função lambda para selecionar uma carta
         select_card = lambda x: (lambda p: self.selectCard(x))
-        # para cada carta na mão do jogador
         for i, card in enumerate(guiImage.getLocalPlayerCurrentHand()):
             cardLabel = self.player1Cards[i]
-            # obtem a imagem correspondente
             cardImage = ImageTk.PhotoImage(Image.open(f"cards/{card.getValue()}{card.getSuit()}.png"))
-            # deixa com borda se ta selecionada
             cardLabel.config(image = cardImage, borderwidth = 2 if card.isSelected() else 0, relief="solid")
             cardLabel.photo_ref = cardImage
             cardLabel.bind("<Button-1>", select_card(card.getId()))
-        # limpa as "restantes"
         for j in range(6 - len(guiImage.getLocalPlayerCurrentHand())):
             cardLabel = self.player1Cards[-(j + 1)]
             cardLabel.config(image = "", borderwidth = 0)
@@ -480,21 +360,21 @@ class PlayerInterface(DogPlayerInterface):
         self.labelPlayer1.config(text = playersInfo[self.table.getLocalPlayerId()].getPlayerName())
 
         if NUMBER_OF_PLAYERS == 4:
-            nomes = [self.labelPlayer2, self.labelPlayer3, self.labelPlayer4]
-            pontuacao = [self.labelPontuacaoPlayer2, self.labelPontuacaoPlayer3, self.labelPontuacaoPlayer4]
+            names = [self.labelPlayer2, self.labelPlayer3, self.labelPlayer4]
+            scores = [self.labelPontuacaoPlayer2, self.labelPontuacaoPlayer3, self.labelPontuacaoPlayer4]
             cards = [self.player2Cards, self.player3Cards, self.player4Cards]
             cards_images = ["backRight", "backUpsideDown", "backLeft"]
         elif NUMBER_OF_PLAYERS == 2:
-            nomes = [self.labelPlayer2]
-            pontuacao = [self.labelPontuacaoPlayer2]
+            names = [self.labelPlayer2]
+            scores = [self.labelPontuacaoPlayer2]
             cards = [self.player2Cards]
             cards_images = ["backRight"]
 
         playersQueue = self.table.getPlayersQueue()
-        for j in range(len(pontuacao)):
+        for j in range(len(scores)):
             playerInfo = playersInfo[playersQueue[(i+j+1) % NUMBER_OF_PLAYERS].getId()]
-            pontuacao[j].config(text = f"Score: {playerInfo.getPoints()}")
-            nomes[j].config(text = playerInfo.getPlayerName())
+            scores[j].config(text = f"Score: {playerInfo.getPoints()}")
+            names[j].config(text = playerInfo.getPlayerName())
             for m in range(playerInfo.getNumberOfCards()):
                 img = ImageTk.PhotoImage(Image.open(f"cards/{cards_images[j]}.png"))
                 cards[j][m].config(image = img)

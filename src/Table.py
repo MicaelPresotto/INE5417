@@ -67,29 +67,22 @@ class Table:
 
     def isSequence(self, cards: list) -> bool:
         for i in range(1,len(cards)):
-            # se for coringa, não verifica se tem o mesmo naipe
             if cards[i].getValue() == "Joker" or cards[i-1].getValue() == "Joker": continue
             if cards[i].getSuit() != cards[i-1].getSuit(): return False
 
         values = [card.getNumber() for card in cards]
         values.sort()
-        # contador de coringas
         countJokers = 0
         for i in range(1, len(values)):
-            # se leu coringa, incrementa
             if values[i] == 0: 
                 countJokers += 1
                 continue
-            # se a carta atual ou a anterior for um coringa, continua
             if values[i] == 0 or values[i-1] == 0: continue
-            # se a carta atual - a anterior não for 1, tenta gastar um coringa
             diff = values[i] - values[i-1]
             if diff == 0: return False
             if diff != 1:
-                # se tem coringas, gasta quantos precisam pra preencher o "espaço" entre as cartas
                 if countJokers >= diff - 1:
                     countJokers -= diff - 1
-                # senão ta errado
                 else:
                     return False
         return True
