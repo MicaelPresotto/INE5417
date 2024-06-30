@@ -312,6 +312,8 @@ class PlayerInterface(DogPlayerInterface):
         if status == self.table.DEFINE_FINISHED_MATCH or status == self.table.DEFINE_WITHDRAWAL:
             self.table.resetGame()
             self.startMatch()
+        else:
+            messagebox.showinfo("Erro ao resetar partida", "Partida já iniciada")
 
     def onClickExit(self):
         self.mainWindow.destroy()
@@ -387,6 +389,7 @@ class PlayerInterface(DogPlayerInterface):
                 startStatus = self.dogActor.start_match(NUMBER_OF_PLAYERS)
                 code = startStatus.get_code()
                 message = startStatus.get_message()
+                print(code)
                 if code == "0" or code == "1":
                     messagebox.showinfo("Dog error", message)
                 elif code == "2":
