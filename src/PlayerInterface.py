@@ -1,6 +1,6 @@
 import json
 import tkinter as tk
-from tkinter import messagebox, simpledialog
+from tkinter import messagebox, simpledialog, Frame, Toplevel
 from PIL import Image, ImageTk
 from dog.dog_actor import DogActor
 from dog.dog_interface import DogPlayerInterface
@@ -199,7 +199,39 @@ class PlayerInterface(DogPlayerInterface):
         else: messagebox.showinfo("Erro ao selecionar carta", "Não é hora de selecionar carta")
 
     def onClickRules(self):
-        messagebox.showinfo("Rules", "Rules clicked")
+        # Creating de child window
+        rules_window=Toplevel(self.mainWindow)
+        rules_window.geometry("1080x720")
+        rules_window.title("Regras")
+        rules_window["bg"]="#FFF7F0"
+
+        # Creating a frame to be inside of the window to handle the layout better
+        unique_frame = Frame(rules_window, bg= "#FFF7F0")
+        unique_frame.pack(fill= 'both', expand = True, padx= 8, pady=16)
+
+        # Labels to show the actual text of the rules
+        # Each Label is a section inside the frame
+        tk.Label(unique_frame, text="Regras do jogo\n",
+                 justify='left', font="Arial 12 bold", bg="#FFF7F0").grid(sticky = 'w', column=0, row=1)
+
+        tk.Label(unique_frame, text="A cada rodada, todos jogadores iniciam com 5 cartas.\n",
+                 justify='left', font="Arial 11", bg="#FFF7F0").grid(sticky = 'w', column=0, row=2)
+
+        tk.Label(unique_frame, text="As jogadas são alternadas. Na sua vez você deve:\n   1. Comprar uma carta (monte de compra ou descarte).\n   2. Descartar.\n   3. Optar por chamar yaniv ou não.",
+                 justify='left', font="Arial 11", bg="#FFF7F0").grid(sticky = 'w', column=0, row=3)
+
+        tk.Label(unique_frame, text="\nVocê pode descartar:\n  - Apenas uma carta;\n  - Sequência de no mínimo 3 cartas do mesmo naipe. Ex: 10 J Q K de ouros;\n  - Conjunto de no mínimo 2 cartas (mesmo valor, naipes diferentes)."+
+                " Ex: 3 de ouros e 3 de copas;\nO uso dos coringas pode ser útil para completar uma carta ausente para formar uma sequência válida. Entretanto, lembre-se que o seu valor é 0 e pode ser útil para confundir o adversário acerca do valor da sua mão.",
+                 justify='left', font="Arial 11", bg="#FFF7F0").grid(sticky = 'w', column=0, row=4)
+
+        tk.Label(unique_frame, text="\nAo chamar yaniv, a rodada é encerrada. Para quem chamou yaniv ganhar a rodada, o mesmo deve possuir <= 6 pontos em sua mão e ser a pontuação mais baixa da mesa.",
+                 justify='left', font="Arial 11", bg="#FFF7F0").grid(sticky = 'w', column=0, row=5)
+
+        tk.Label(unique_frame, text="\nCaso o jogador que chamou yaniv cumprir todos os requisitos, todos outros jogadores recebem uma penalidade de 10 pontos.\nCaso contrário, o jogador recebe 30 pontos de penalidade.",
+                 justify='left', font="Arial 11", bg="#FFF7F0").grid(sticky = 'w', column=0, row=6)
+        
+        tk.Label(unique_frame, text="\nA partida encerra quando um jogador chegar a 100 pontos. Ganha quem possuir a menor pontuação.",
+                 justify='left', font="Arial 11", bg="#FFF7F0").grid(sticky = 'w', column=0, row=7)
 
     def onClickReset(self):
         status = self.table.getStatus()
