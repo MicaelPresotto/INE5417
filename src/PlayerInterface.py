@@ -33,6 +33,7 @@ class PlayerInterface(DogPlayerInterface):
         exit()
 
     def receive_start(self, start_status):
+        self.table.resetGame()
         code = int(start_status.code)
         if code == 0 or code == 1:
             messagebox.showinfo("Problema", start_status.message)
@@ -330,6 +331,7 @@ class PlayerInterface(DogPlayerInterface):
         #     self.updateGui(guiImage)
         # else:
         #     messagebox.showinfo("Erro ao resetar", "Não é possível resetar")
+            self.table.resetGame()
             self.startMatch()
 
     def onClickExit(self):
@@ -450,7 +452,6 @@ class PlayerInterface(DogPlayerInterface):
                 messagebox.showinfo("Round finished", "Round finished")
         if "match_status" in a_move and a_move["match_status"] == "finished":
             messagebox.showinfo("Match finished", "Match finished")
-        print("teste pro receive move")
         self.table.receiveMove(a_move)
         guiImage = self.table.getGUIImage()
         self.updateGui(guiImage)

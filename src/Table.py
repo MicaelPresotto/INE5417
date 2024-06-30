@@ -119,7 +119,6 @@ class Table:
         self.setStatus(self.DEFINE_WITHDRAWAL)
         
     def receiveMove(self, a_move: dict):
-        print(a_move)
         code = ""
         if "code" in a_move: 
             code = a_move["code"].upper()
@@ -261,17 +260,16 @@ class Table:
         for player in self.playersQueue:
             if not player.getTurn():
                 player.updateTotalPoints(10)
-    #TODO: nao esta funcionando ainda
+
     def resetGame(self):
-        turnPlayer = self.identifyTurnPlayer()
-        for player in self.playersQueue:
-            player.setTotalPoints(0)
-            player.setWinner(False)
-        self.resetRound()
-        self.round = 1
-        turnPlayer.toggleTurn()
-        self.updatePlayersQueueIndex()
-        self.playersQueue[self.playersQueueIndex].toggleTurn()
+        self.playersQueue = []
+        self.discardDeck = DiscardDeck()
+        self.buyDeck = BuyDeck()
+        self.message = ""
+        self.round = 0
+        self.status = 0
+        self.playersQueueIndex = 0
+        self.localPlayerId = ""
 
     def resetRound(self):
         self.round += 1
