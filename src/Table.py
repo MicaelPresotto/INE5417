@@ -124,68 +124,38 @@ class Table:
             code = a_move["code"].upper()
         if "playersQueue" in a_move:
             for p in json.loads(a_move["playersQueue"]):
-                id = p["id"]
-                name = p["name"]
-                turn = p["turn"]
-                isWinner = p["winner"]
-                totalPoints = p["totalPoints"]
-                player = Player(id, name)
-                player.setTurn(turn)
-                player.setWinner(isWinner)
-                player.setTotalPoints(totalPoints)
-                self.playersQueue.append(player)
-        if code == "RESET ROUND":
-            self.round = json.loads(a_move["round"])
+                self.playersQueue.append(Player(p["id"], p["name"], p["turn"], p["totalPoints"], [], p["winner"] ))
+        if "hands" in a_move:
             playersHands = json.loads(a_move['hands'])
             for player in self.playersQueue:
                 playerHand = playersHands[player.getId()]
                 hands_restored = [Card(card["id"], card["value"], card["suit"], card["points"], card["number"]) for card in playerHand]
                 player.setCurrentHand(hands_restored)
-            turnPlayer = self.identifyTurnPlayer()
-            if turnPlayer.getId() == self.getLocalPlayerId():
-                self.setStatus(self.DEFINE_BUY_CARD_ACTION)
-            else:
-                self.setStatus(self.DEFINE_WAITING_FOR_REMOTE_ACTION)
+        if "discardDeck" in a_move and "buyDeck" in a_move:
             self.discardDeck.setCards([Card(card["id"], card["value"], card["suit"], card["points"], card["number"]) for card in json.loads(a_move["discardDeck"])])
             self.buyDeck.setCards([Card(card["id"], card["value"], card["suit"], card["points"], card["number"]) for card in json.loads(a_move["buyDeck"])])
-            if "playersQueueIndex" in a_move:
+        if "playersQueueIndex" in a_move:
                 self.setPlayersQueueIndex(json.loads(a_move["playersQueueIndex"]))
-        if code == "BUY CARD":
+        if code == "RESET ROUND":
+            self.round = json.loads(a_move["round"])
+            turnPlayer = self.identifyTurnPlayer()
+            self.setStatus(self.DEFINE_BUY_CARD_ACTION if turnPlayer.getId() == self.getLocalPlayerId() else self.DEFINE_WAITING_FOR_REMOTE_ACTION)
+        elif code == "BUY CARD":
             self.buyCard(a_move["isBuyDeck"])
-        if code == "DISCARD":
+        elif code == "DISCARD":
             selected_cards = json.loads(a_move["selected_cards"])
             turnPlayerCurrentHand = self.identifyTurnPlayer().getCurrentHand()
             for card in turnPlayerCurrentHand:
-                if card.getId() in selected_cards:
-                    card.setSelected(True)
+                if card.getId() in selected_cards: card.setSelected(True)
             self.discard()
-        if code == "OPT YANIV":
+        elif code == "OPT YANIV":
             self.optYaniv(a_move["opt"])
             turnPlayer = self.identifyTurnPlayer()
-            # Se o novo jogador da vez é o player remoto que recebeu a jogada do opt yaniv
-            # seu status deve se tornar buy card action
             if turnPlayer.getId() == self.getLocalPlayerId():
                 self.setStatus(self.DEFINE_BUY_CARD_ACTION)
-        if code == "WITHDRAWAL":
+        elif code == "WITHDRAWAL":
             self.receiveWithdrawalNotification()
-        #TODO: testar
         if a_move["match_status"] == "finished":
-            self.playersQueue = []
-            playersHands = json.loads(a_move['hands'])
-            for p in json.loads(a_move["playersQueue"]):
-                id = p["id"]
-                name = p["name"]
-                turn = p["turn"]
-                isWinner = p["winner"]
-                totalPoints = p["totalPoints"]
-                player = Player(id, name)
-                player.setTurn(turn)
-                player.setWinner(isWinner)
-                player.setTotalPoints(totalPoints)
-                self.playersQueue.append(player)
-                playerHand = playersHands[id]
-                hands_restored = [Card(card["id"], card["value"], card["suit"], card["points"], card["number"]) for card in playerHand]
-                player.setCurrentHand(hands_restored)
             self.setStatus(self.DEFINE_FINISHED_MATCH)
 
 
@@ -217,7 +187,6 @@ class Table:
     def getGUIImage(self) -> GUIImage:
         guiImage = GUIImage()
         turnPlayer = self.identifyTurnPlayer()
-        name = turnPlayer.getName()
         cards = self.discardDeck.getCards()
         guiImage.setDiscardDeckFirstCard(cards[-1] if len(cards) else None)
         lenBuyDeck = self.buyDeck.getSize()
@@ -238,13 +207,13 @@ class Table:
             case self.DEFINE_NO_MATCH:
                 message = "Start a match in the menu"
             case self.DEFINE_BUY_CARD_ACTION:
-                message = name + " must buy a card"
+                message = "You must buy a card"
             case self.DEFINE_DISCARD_OR_SELECT_CARD_ACTION:
-                message = name + " must discard"
+                message = "You must discard"
             case self.DEFINE_OPT_YANIV:
-                message = name + " must opt for yaniv"
+                message = "You must opt for yaniv"
             case self.DEFINE_WAITING_FOR_REMOTE_ACTION:
-                message = "Turn player: " + name
+                message = "Turn player: " + turnPlayer.getName()
             case self.DEFINE_FINISHED_MATCH:
                 winner = self.getWinner()
                 message = "Winner: " + winner.getName()

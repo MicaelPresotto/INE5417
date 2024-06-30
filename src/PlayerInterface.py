@@ -331,26 +331,23 @@ class PlayerInterface(DogPlayerInterface):
             }
             self.dogActor.send_move(move_to_send)
             if opt and not match_finished:
+                self.table.setStatus(self.table.DEFINE_WAITING_FOR_REMOTE_ACTION)
                 tk.messagebox.showinfo("Round finished", "Round finished")
                 self.table.resetRound()
                 playersQueue = self.table.getPlayersQueue()
                 localPlayerId = self.table.getLocalPlayerId()
-                hands = {}
-                for player in playersQueue:
-                    hands[player.getId()] = player.getCurrentHand()
+                hands = {player.getId(): player.getCurrentHand() for player in playersQueue}
                 hands_serializable = {playerId: [card.__dict__ for card in hand] for playerId, hand in hands.items()}
                 move_to_send = {
                     "match_status": "next",
                     "code": "RESET ROUND",
                     "hands": json.dumps(hands_serializable),
-                    # "buyDeck": json.dumps([card.__dict__ for card in self.table.buyDeck.getCards()]),
-                    # "discardDeck": json.dumps([card.__dict__ for card in self.table.discardDeck.getCards()]),
                     "buyDeck": json.dumps(self.table.buyDeck.getCards(), default=self.convertToJson),
                     "discardDeck": json.dumps(self.table.discardDeck.getCards(), default=self.convertToJson),
-                    "round": json.dumps(self.table.getRound()),
+                    "round": self.table.getRound(),
                     "fromYaniv": True,
+                    "status": self.table.DEFINE_WAITING_FOR_REMOTE_ACTION
                 }
-                self.table.setStatus(self.table.DEFINE_WAITING_FOR_REMOTE_ACTION)
                 self.dogActor.send_move(move_to_send)
             elif opt and match_finished:
                 self.table.setStatus(self.table.DEFINE_FINISHED_MATCH)
@@ -362,9 +359,7 @@ class PlayerInterface(DogPlayerInterface):
                         player.setWinner(True)
                         break
                 playersQueue = self.table.getPlayersQueue()
-                hands = {}
-                for player in playersQueue:
-                    hands[player.getId()] = player.getCurrentHand()
+                hands = {player.getId(): player.getCurrentHand() for player in playersQueue}
                 hands_serializable = {playerId: [card.__dict__ for card in hand] for playerId, hand in hands.items()}
                 move_to_send = {
                     "match_status": "finished",
@@ -400,27 +395,24 @@ class PlayerInterface(DogPlayerInterface):
                     indexPlayer = self.table.getPlayerIndexById(localPlayerId)
                     self.table.setPlayersQueueIndex(indexPlayer)
                     self.table.startMatch()
-                hands = {}
-                for player in self.table.getPlayersQueue():
-                    hands[player.getId()] = player.getCurrentHand()
-
-                hands_serializable = {playerId: [card.__dict__ for card in hand] for playerId, hand in hands.items()}
-                    
-                move_to_send = {
-                    "match_status": "progress",
-                    "code": "RESET ROUND",
-                    "hands": json.dumps(hands_serializable),
-                    "buyDeck": json.dumps([card.__dict__ for card in self.table.buyDeck.getCards()]),
-                    "discardDeck": json.dumps([card.__dict__ for card in self.table.discardDeck.getCards()]),
-                    "playersQueue": json.dumps(self.table.getPlayersQueue(),  default=self.convertToJson),
-                    "playersQueueIndex": json.dumps(indexPlayer),
-                    "round": json.dumps(self.table.getRound()),
-                    "fromYaniv": False,
-                }
-                self.dogActor.send_move(move_to_send)
-                self.table.setStatus(self.table.DEFINE_BUY_CARD_ACTION)
-                guiImage = self.table.getGUIImage()
-                self.updateGui(guiImage)
+                    hands = {player.getId(): player.getCurrentHand() for player in self.table.getPlayersQueue()}
+                    hands_serializable = {playerId: [card.__dict__ for card in hand] for playerId, hand in hands.items()}
+                        
+                    move_to_send = {
+                        "match_status": "progress",
+                        "code": "RESET ROUND",
+                        "hands": json.dumps(hands_serializable),
+                        "buyDeck": json.dumps(self.table.buyDeck.getCards(), default=self.convertToJson),
+                        "discardDeck": json.dumps(self.table.discardDeck.getCards(), default=self.convertToJson),
+                        "playersQueue": json.dumps(self.table.getPlayersQueue(),  default=self.convertToJson),
+                        "playersQueueIndex": json.dumps(indexPlayer),
+                        "round": json.dumps(self.table.getRound()),
+                        "fromYaniv": False,
+                    }
+                    self.dogActor.send_move(move_to_send)
+                    self.table.setStatus(self.table.DEFINE_BUY_CARD_ACTION)
+                    guiImage = self.table.getGUIImage()
+                    self.updateGui(guiImage)
         else:
             messagebox.showinfo("Erro ao iniciar partida", "Partida já iniciada")
     
@@ -432,8 +424,8 @@ class PlayerInterface(DogPlayerInterface):
         if "code" in a_move and a_move["code"] == "RESET ROUND":
             if a_move["fromYaniv"]:
                 messagebox.showinfo("Round finished", "Round finished")
-        if "match_status" in a_move and a_move["match_status"] == "finished":
-            messagebox.showinfo("Match finished", "Match finished")
+            elif a_move["match_status"] == "finished":
+                messagebox.showinfo("Match finished", "Match finished")
         self.table.receiveMove(a_move)
         guiImage = self.table.getGUIImage()
         self.updateGui(guiImage)

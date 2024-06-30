@@ -1,13 +1,13 @@
 from Card import Card
 
 class Player:
-    def __init__(self, id: str, name: str):
+    def __init__(self, id: str, name: str, turn = False, totalPoints = 0, currentHand = [], winner = False):
         self.id = id
         self.name = name
-        self.turn = False
-        self.totalPoints = 0
-        self.currentHand = []
-        self.winner = False
+        self.turn = turn
+        self.totalPoints = totalPoints
+        self.currentHand = currentHand.copy()
+        self.winner = winner
 
     def addCard(self, card: Card):
         self.currentHand.append(card)
