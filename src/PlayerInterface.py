@@ -346,7 +346,6 @@ class PlayerInterface(DogPlayerInterface):
                     "discardDeck": json.dumps(self.table.discardDeck.getCards(), default=self.convertToJson),
                     "round": self.table.getRound(),
                     "fromYaniv": True,
-                    "status": self.table.DEFINE_WAITING_FOR_REMOTE_ACTION
                 }
                 self.dogActor.send_move(move_to_send)
             elif opt and match_finished:
