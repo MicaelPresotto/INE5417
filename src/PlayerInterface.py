@@ -320,7 +320,7 @@ class PlayerInterface(DogPlayerInterface):
                         "discardDeck": json.dumps(self.table.discardDeck.getCards(), default=self.convertToJson),
                         "playersQueue": json.dumps(self.table.getPlayersQueue(),  default=self.convertToJson),
                         "playersQueueIndex": json.dumps(indexPlayer),
-                        "round": json.dumps(self.table.getRound()),
+                        "round": self.table.getRound(),
                         "fromYaniv": False,
                     }
                     self.dogActor.send_move(move_to_send)
