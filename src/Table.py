@@ -87,16 +87,15 @@ class Table:
                     return False
         return True
 
-    def buyCard(self, isBuyDeck: bool):
+    def buyCard(self, isBuyDeck: bool) -> bool:
         turnPlayer = self.identifyTurnPlayer()
         selectedDeck = self.buyDeck if isBuyDeck else self.discardDeck
-        
+        if selectedDeck.getSize() == 0: return False
         card = selectedDeck.popCard()
         turnPlayer.addCard(card)
-
-    def discard(self):
+        return True
+    def discard(self, selectedCards: list):
         turnPlayer = self.identifyTurnPlayer()
-        selectedCards = turnPlayer.getSelectedCards()
         if len(selectedCards) == 0:
             return False
         is_sequence = False

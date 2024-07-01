@@ -146,22 +146,21 @@ class PlayerInterface(DogPlayerInterface):
         status = self.table.getStatus()
         turnPlayer = self.table.identifyTurnPlayer()
         localPlayerId = self.table.getLocalPlayerId()
-        numCards = self.table.buyDeck.getSize()
-        if status == self.table.DEFINE_BUY_CARD_ACTION and turnPlayer.getId() == localPlayerId and numCards > 0:
-            self.table.buyCard(isBuyDeck)
-            move_to_send = {
-                "match_status": "progress",
-                "code": "BUY CARD",
-                "isBuyDeck": isBuyDeck
-            }
-            self.dogActor.send_move(move_to_send)
-            self.table.setStatus(self.table.DEFINE_DISCARD_OR_SELECT_CARD_ACTION)
-            guiImage = self.table.getGUIImage()
-            self.updateGui(guiImage)
+        if status == self.table.DEFINE_BUY_CARD_ACTION and turnPlayer.getId() == localPlayerId:
+            if self.table.buyCard(isBuyDeck):
+                move_to_send = {
+                    "match_status": "progress",
+                    "code": "BUY CARD",
+                    "isBuyDeck": isBuyDeck
+                }
+                self.dogActor.send_move(move_to_send)
+                self.table.setStatus(self.table.DEFINE_DISCARD_OR_SELECT_CARD_ACTION)
+                guiImage = self.table.getGUIImage()
+                self.updateGui(guiImage)
+            else:
+                messagebox.showinfo("Erro ao comprar", "Baralho vazio")
         elif turnPlayer.getId() != localPlayerId:
             messagebox.showinfo("Erro ao comprar", "Não é sua vez de comprar")
-        elif numCards == 0:
-            messagebox.showinfo("Erro ao comprar", "Baralho de compra vazio")
         else:
             messagebox.showinfo("Erro ao comprar", "Não é hora de comprar")
 
@@ -171,7 +170,7 @@ class PlayerInterface(DogPlayerInterface):
         localPlayerId = self.table.getLocalPlayerId()
         if status == self.table.DEFINE_DISCARD_OR_SELECT_CARD_ACTION and turnPlayer.getId() == localPlayerId:
             selected_cards = turnPlayer.getSelectedCards()
-            validDiscard = self.table.discard()
+            validDiscard = self.table.discard(selected_cards)
             if not validDiscard:
                 messagebox.showinfo("Erro ao descartar", "Descarte inválido")
                 return
