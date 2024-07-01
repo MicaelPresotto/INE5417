@@ -75,10 +75,10 @@ class Table:
         values.sort()
         countJokers = 0
         for i in range(1, len(values)):
-            if values[i] == 0: 
+            if values[i-1] == 0: 
                 countJokers += 1
                 continue
-            if values[i-1] == 0: continue
+            if values[i] == 0: continue
             diff = values[i] - values[i-1]
             if diff == 0: return False
             if diff != 1:
