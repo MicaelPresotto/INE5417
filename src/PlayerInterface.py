@@ -9,6 +9,7 @@ from GUIImage import GUIImage
 from Player import Player
 from Card import Card
 from utils import NUMBER_OF_PLAYERS
+import random
 
 class PlayerInterface(DogPlayerInterface):
     def __init__(self):
@@ -229,7 +230,7 @@ class PlayerInterface(DogPlayerInterface):
         tk.Label(unique_frame, text="\nCaso o jogador que chamou yaniv cumprir todos os requisitos, todos outros jogadores recebem uma penalidade de 10 pontos.\nCaso contrário, o jogador recebe 30 pontos de penalidade.",
                  justify='left', font="Arial 11", bg="#FFF7F0").grid(sticky = 'w', column=0, row=6)
         
-        tk.Label(unique_frame, text="\nA partida encerra quando um jogador chegar a 100 pontos. Ganha quem possuir a menor pontuação.",
+        tk.Label(unique_frame, text="\nA partida encerra quando um jogador chegar a 100 pontos. Ganha quem possuir a menor pontuação.\nCaso haja empate, ganha o jogador que tiver menos pontos em suas mãos.\nCaso haja novo empate, o vencedor é sorteado.",
                  justify='left', font="Arial 11", bg="#FFF7F0").grid(sticky = 'w', column=0, row=7)
 
     def onClickReset(self):
@@ -279,7 +280,21 @@ class PlayerInterface(DogPlayerInterface):
                 for player in self.table.getPlayersQueue():
                     if player.getTotalPoints() == min(pontosJogadores):
                         player.setWinner(True)
-                        break
+                winners = [player for player in self.table.getPlayersQueue() if player.isWinner()]
+                if len(winners) > 1:
+                    minPoints = winners[0].getCurrentHandTotalPoints()
+                    for player in winners:
+                        playerCurrHandPoints = player.getCurrentHandTotalPoints()
+                        if playerCurrHandPoints < minPoints:
+                            minPoints = playerCurrHandPoints
+                    winners = [player for player in winners if player.getCurrentHandTotalPoints() == minPoints]        
+                    winner = winners[0]
+                    if len(winners) > 1:
+                        winner = random.choice(winners)
+                    for player in self.table.getPlayersQueue():
+                        if player.getId() != winner.getId():
+                            player.setWinner(False)
+
                 playersQueue = self.table.getPlayersQueue()
                 hands = {player.getId(): player.getCurrentHand() for player in playersQueue}
                 hands_serializable = {playerId: [card.__dict__ for card in hand] for playerId, hand in hands.items()}
@@ -340,7 +355,7 @@ class PlayerInterface(DogPlayerInterface):
     def receive_move(self, a_move):
         if "code" in a_move and a_move["code"] == "RESET ROUND":
             if a_move["fromYaniv"]: messagebox.showinfo("Round finished", "Round finished")
-            elif a_move["match_status"] == "finished": messagebox.showinfo("Match finished", "Match finished")
+        if a_move["match_status"] == "finished": messagebox.showinfo("Match finished", "Match finished")
         self.table.receiveMove(a_move)
         guiImage = self.table.getGUIImage()
         self.updateGui(guiImage)

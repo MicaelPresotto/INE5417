@@ -48,6 +48,9 @@ class Player:
 
     def getCurrentHand(self) -> list:
         return self.currentHand.copy()
+
+    def getCurrentHandTotalPoints(self) -> int:
+        return sum([card.getPoints() for card in self.currentHand])
     
     def setCurrentHand(self, hand: list):
         self.currentHand = hand.copy()
