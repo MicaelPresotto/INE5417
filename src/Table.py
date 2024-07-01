@@ -95,8 +95,9 @@ class Table:
         card = selectedDeck.popCard()
         turnPlayer.addCard(card)
         return True
-    def discard(self, selectedCards: list):
+    def discard(self):
         turnPlayer = self.identifyTurnPlayer()
+        selectedCards = turnPlayer.getSelectedCards()
         if len(selectedCards) == 0:
             return False
         is_sequence = False
