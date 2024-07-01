@@ -272,13 +272,12 @@ class Table:
     def getPlayersQueue(self) -> list[Player]:
         return self.playersQueue.copy()
     
-    def setWinner(self):
+    def setGameWinner(self):
         playersPoints = [player.getTotalPoints() for player in self.getPlayersQueue()]
         for player in self.getPlayersQueue():
             if player.getTotalPoints() == min(playersPoints):
                 player.setWinner(True)
         winners = [player for player in self.getPlayersQueue() if player.isWinner()]
-        winner = winners[0]
         if len(winners) > 1:
             minPoints = winners[0].getCurrentHandTotalPoints()
             for player in winners:
@@ -289,6 +288,6 @@ class Table:
             winner = winners[0]
             if len(winners) > 1:
                 winner = random.choice(winners)
-            for player in self.table.getPlayersQueue():
+            for player in self.getPlayersQueue():
                 if player.getId() != winner.getId():
                     player.setWinner(False)

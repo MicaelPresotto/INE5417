@@ -170,7 +170,7 @@ class PlayerInterface(DogPlayerInterface):
         localPlayerId = self.table.getLocalPlayerId()
         if status == self.table.DEFINE_DISCARD_OR_SELECT_CARD_ACTION and turnPlayer.getId() == localPlayerId:
             selected_cards = turnPlayer.getSelectedCards()
-            validDiscard = self.table.discard()
+            validDiscard = self.table.discard(selected_cards)
             if not validDiscard:
                 messagebox.showinfo("Erro ao descartar", "Descarte inválido")
                 return
