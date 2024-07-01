@@ -95,6 +95,7 @@ class Table:
         card = selectedDeck.popCard()
         turnPlayer.addCard(card)
         return True
+
     def discard(self, selectedCards: list):
         turnPlayer = self.identifyTurnPlayer()
         if len(selectedCards) == 0:
