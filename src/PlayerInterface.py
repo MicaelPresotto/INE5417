@@ -275,7 +275,7 @@ class PlayerInterface(DogPlayerInterface):
             elif opt and match_finished:
                 self.table.setStatus(self.table.DEFINE_FINISHED_MATCH)
                 tk.messagebox.showinfo("Match finished", "Match finished")
-                self.table.setWinner()
+                self.table.setGameWinner()
                 playersQueue = self.table.getPlayersQueue()
                 hands = {player.getId(): player.getCurrentHand() for player in playersQueue}
                 hands_serializable = {playerId: [card.__dict__ for card in hand] for playerId, hand in hands.items()}
