@@ -108,9 +108,6 @@ class Table:
             return True
         return False
 
-    # def receiveWithdrawalNotification(self):
-    #     self.setStatus(self.DEFINE_WITHDRAWAL)
-        
     def receiveMove(self, a_move: dict):
         code = ""
         if "code" in a_move: 
@@ -146,12 +143,8 @@ class Table:
             turnPlayer = self.identifyTurnPlayer()
             if turnPlayer.getId() == self.getLocalPlayerId():
                 self.setStatus(self.DEFINE_BUY_CARD_ACTION)
-        elif code == "WITHDRAWAL":
-            self.receiveWithdrawalNotification()
         if a_move["match_status"] == "finished":
             self.setStatus(self.DEFINE_FINISHED_MATCH)
-
-
     
     def optYaniv(self, yanivOpt: bool) -> bool:
         turnPlayer = self.identifyTurnPlayer()

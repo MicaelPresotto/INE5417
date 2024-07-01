@@ -21,10 +21,10 @@ class PlayerInterface(DogPlayerInterface):
         self.createMenu()
         self.table = Table()
         self.dogActor = DogActor()
-        self.connectingToDogServer()
+        self.connectToDogServer()
         self.mainWindow.mainloop()
     
-    def connectingToDogServer(self):
+    def connectToDogServer(self):
         playerName = simpledialog.askstring("Player name", "Enter your name")
         msg = self.dogActor.initialize(playerName, self)
         messagebox.showinfo("Connection", msg)
@@ -141,7 +141,7 @@ class PlayerInterface(DogPlayerInterface):
         self.menuFile.add_separator()
         self.menuFile.add_command(label="Exit", command=self.onClickExit)
 
-    def buyCard(self, isBuyDeck):
+    def buyCard(self, isBuyDeck: bool):
         status = self.table.getStatus()
         turnPlayer = self.table.identifyTurnPlayer()
         localPlayerId = self.table.getLocalPlayerId()
@@ -185,9 +185,8 @@ class PlayerInterface(DogPlayerInterface):
             self.updateGui(guiImage)
         elif turnPlayer.getId() != localPlayerId: messagebox.showinfo("Erro ao descartar", "Não é sua vez de descartar")
         else: messagebox.showinfo("Erro ao descartar", "Não é hora de descartar")
-        
 
-    def selectCard(self, cardId):
+    def selectCard(self, cardId: int):
         status = self.table.getStatus()
         turnPlayer = self.table.identifyTurnPlayer()
         localPlayerId = self.table.getLocalPlayerId()
