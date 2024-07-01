@@ -33,7 +33,8 @@ Para abrir a especificação de requisitos, abra o arquivo Especificacao de Requ
 Execução do código
 1. Em um computador com a versão 3.11 do Python instalada, acesse a
 pasta src do arquivo descompactado.
-2. Execute o arquivo main.py.
-2.a. Você pode executar o arquivo pelo terminal com comandos como py
+2. Instale as dependencias com pip3 install -r requirements.txt
+3. Execute o arquivo main.py.
+3.a. Você pode executar o arquivo pelo terminal com comandos como py
 main.py, python main.py ou outros a depender das
 configurações da sua instalação.
