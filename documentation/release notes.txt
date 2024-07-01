@@ -1,0 +1,39 @@
+Yaniv
+v1.0 01/07/2024
+
+Conteúdo da entrega
+➔ Especificação de requisitos
+➔ Visão geral
+➔ Regras do jogo
+➔ Requisitos funcionais
+➔ Requisitos não funcionais
+➔ Modelagem UML
+➔ Diagrama de casos de uso
+➔ Diagrama de visão geral de interação
+➔ Diagramas de atividade
+➔ Diagramas de sequência
+➔ Diagramas de máquina de estados
+➔ Diagrama de algoritmos de métodos
+➔ Código funcional
+➔ Código do jogo Yaniv seguindo as definições da especificação de
+requisitos e da modelagem UML, bem como todos os arquivos
+necessários para sua execução de forma distribuída via DOG.
+
+➔ Release notes
+Release notes: Yaniv 1.0
+
+Acesso à modelagem
+Para abrir a modelagem UML, é necessário utilizar a instalação 17.2 do Visual
+Paradigm Community Edition para acessar o arquivo yaniv.vpp,
+disponibilizado na pasta documentation.
+
+Como acessar a especificação de requisitos
+Para abrir a especificação de requisitos, abra o arquivo Especificacao de Requisitos.pdf.
+
+Execução do código
+1. Em um computador com a versão 3.11 do Python instalada, acesse a
+pasta src do arquivo descompactado.
+2. Execute o arquivo main.py.
+2.a. Você pode executar o arquivo pelo terminal com comandos como py
+main.py, python main.py ou outros a depender das
+configurações da sua instalação.
