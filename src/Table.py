@@ -78,7 +78,7 @@ class Table:
             if values[i] == 0: 
                 countJokers += 1
                 continue
-            if values[i] == 0 or values[i-1] == 0: continue
+            if values[i-1] == 0: continue
             diff = values[i] - values[i-1]
             if diff == 0: return False
             if diff != 1:
@@ -96,7 +96,7 @@ class Table:
         turnPlayer.addCard(card)
         return True
 
-    def discard(self, selectedCards: list):
+    def discard(self):
         turnPlayer = self.identifyTurnPlayer()
         selectedCards = turnPlayer.getSelectedCards()
         if len(selectedCards) == 0:
