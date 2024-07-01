@@ -129,7 +129,7 @@ class Table:
         if "playersQueueIndex" in a_move:
                 self.setPlayersQueueIndex(json.loads(a_move["playersQueueIndex"]))
         if code == "RESET ROUND":
-            self.round = json.loads(a_move["round"])
+            self.round = a_move["round"]
             turnPlayer = self.identifyTurnPlayer()
             self.setStatus(self.DEFINE_BUY_CARD_ACTION if turnPlayer.getId() == self.getLocalPlayerId() else self.DEFINE_WAITING_FOR_REMOTE_ACTION)
         elif code == "BUY CARD":
