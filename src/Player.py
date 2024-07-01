@@ -31,14 +31,10 @@ class Player:
         return self.totalPoints
     
     def checkIfLowestHand(self, playersQueue: list) -> bool:
-        turnPlayerCurrentPoints = 0
-        for card in self.getCurrentHand():
-            turnPlayerCurrentPoints += card.getPoints()
+        turnPlayerCurrentPoints = self.getCurrentHandTotalPoints()
         for player in playersQueue:
             if not player.getTurn():
-                playerCurrentPoints = 0
-                for card in player.getCurrentHand():
-                    playerCurrentPoints += card.getPoints()
+                playerCurrentPoints = player.getCurrentHandTotalPoints()
                 if playerCurrentPoints <= turnPlayerCurrentPoints:
                     return False
         return True

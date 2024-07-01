@@ -98,6 +98,7 @@ class Table:
 
     def discard(self, selectedCards: list):
         turnPlayer = self.identifyTurnPlayer()
+        selectedCards = turnPlayer.getSelectedCards()
         if len(selectedCards) == 0:
             return False
         is_sequence = False
