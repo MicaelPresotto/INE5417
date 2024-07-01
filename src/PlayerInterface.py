@@ -138,7 +138,7 @@ class PlayerInterface(DogPlayerInterface):
 
         self.menuFile.add_command(label="Rules", command=self.onClickRules)
         self.menuFile.add_command(label="Start game", command=self.startMatch)
-        self.menuFile.add_command(label="Reset game", command=self.onClickReset)
+        self.menuFile.add_command(label="Reset game", command=self.resetGame)
         self.menuFile.add_separator()
         self.menuFile.add_command(label="Exit", command=self.onClickExit)
 
@@ -232,7 +232,7 @@ class PlayerInterface(DogPlayerInterface):
         tk.Label(unique_frame, text="\nA partida encerra quando um jogador chegar a 100 pontos. Ganha quem possuir a menor pontuação.\nCaso haja empate, ganha o jogador que tiver menos pontos em suas mãos.\nCaso haja novo empate, o vencedor é sorteado.",
                  justify='left', font="Arial 11", bg="#FFF7F0").grid(sticky = 'w', column=0, row=7)
 
-    def onClickReset(self):
+    def resetGame(self):
         status = self.table.getStatus()
         if status == self.table.DEFINE_FINISHED_MATCH or status == self.table.DEFINE_WITHDRAWAL:
             self.table.resetGame()
@@ -275,25 +275,7 @@ class PlayerInterface(DogPlayerInterface):
             elif opt and match_finished:
                 self.table.setStatus(self.table.DEFINE_FINISHED_MATCH)
                 tk.messagebox.showinfo("Match finished", "Match finished")
-                pontosJogadores = [player.getTotalPoints() for player in self.table.getPlayersQueue()]
-                for player in self.table.getPlayersQueue():
-                    if player.getTotalPoints() == min(pontosJogadores):
-                        player.setWinner(True)
-                winners = [player for player in self.table.getPlayersQueue() if player.isWinner()]
-                if len(winners) > 1:
-                    minPoints = winners[0].getCurrentHandTotalPoints()
-                    for player in winners:
-                        playerCurrHandPoints = player.getCurrentHandTotalPoints()
-                        if playerCurrHandPoints < minPoints:
-                            minPoints = playerCurrHandPoints
-                    winners = [player for player in winners if player.getCurrentHandTotalPoints() == minPoints]        
-                    winner = winners[0]
-                    if len(winners) > 1:
-                        winner = random.choice(winners)
-                    for player in self.table.getPlayersQueue():
-                        if player.getId() != winner.getId():
-                            player.setWinner(False)
-
+                self.table.setWinner()
                 playersQueue = self.table.getPlayersQueue()
                 hands = {player.getId(): player.getCurrentHand() for player in playersQueue}
                 hands_serializable = {playerId: [card.__dict__ for card in hand] for playerId, hand in hands.items()}
