@@ -218,19 +218,22 @@ class PlayerInterface(DogPlayerInterface):
 
         tk.Label(unique_frame, text="As jogadas são alternadas. Na sua vez você deve:\n   1. Comprar uma carta (monte de compra ou descarte).\n   2. Descartar.\n   3. Optar por chamar yaniv ou não.",
                  justify='left', font="Arial 11", bg="#FFF7F0").grid(sticky = 'w', column=0, row=3)
+        
+        tk.Label(unique_frame, text="A pontuação das cartas segue como o seu próprio valor, exceto as especiais(Q,J,K) que valem 10 e o Joker que vale 0.",
+                 justify='left', font="Arial 11", bg="#FFF7F0").grid(sticky = 'w', column=0, row=4)
 
         tk.Label(unique_frame, text="\nVocê pode descartar:\n  - Apenas uma carta;\n  - Sequência de no mínimo 3 cartas do mesmo naipe. Ex: 10 J Q K de ouros;\n  - Conjunto de no mínimo 2 cartas (mesmo valor, naipes diferentes)."+
                 " Ex: 3 de ouros e 3 de copas;\nO uso dos coringas pode ser útil para completar uma carta ausente para formar uma sequência válida. Entretanto, lembre-se que o seu valor é 0 e pode ser útil para confundir o adversário acerca do valor da sua mão.",
-                 justify='left', font="Arial 11", bg="#FFF7F0").grid(sticky = 'w', column=0, row=4)
-
-        tk.Label(unique_frame, text="\nAo chamar yaniv, a rodada é encerrada. Para quem chamou yaniv ganhar a rodada, o mesmo deve possuir <= 6 pontos em sua mão e ser a pontuação mais baixa da mesa.",
                  justify='left', font="Arial 11", bg="#FFF7F0").grid(sticky = 'w', column=0, row=5)
 
-        tk.Label(unique_frame, text="\nCaso o jogador que chamou yaniv cumprir todos os requisitos, todos outros jogadores recebem uma penalidade de 10 pontos.\nCaso contrário, o jogador recebe 30 pontos de penalidade.",
+        tk.Label(unique_frame, text="\nAo chamar yaniv, a rodada é encerrada. Para quem chamou yaniv ganhar a rodada, o mesmo deve possuir <= 6 pontos em sua mão e ser a pontuação mais baixa da mesa.",
                  justify='left', font="Arial 11", bg="#FFF7F0").grid(sticky = 'w', column=0, row=6)
+
+        tk.Label(unique_frame, text="\nCaso o jogador que chamou yaniv cumprir todos os requisitos, todos outros jogadores recebem uma penalidade de 10 pontos.\nCaso contrário, o jogador recebe 30 pontos de penalidade.",
+                 justify='left', font="Arial 11", bg="#FFF7F0").grid(sticky = 'w', column=0, row=7)
         
         tk.Label(unique_frame, text="\nA partida encerra quando um jogador chegar a 100 pontos. Ganha quem possuir a menor pontuação.\nCaso haja empate, ganha o jogador que tiver menos pontos em suas mãos.\nCaso haja novo empate, o vencedor é sorteado.",
-                 justify='left', font="Arial 11", bg="#FFF7F0").grid(sticky = 'w', column=0, row=7)
+                 justify='left', font="Arial 11", bg="#FFF7F0").grid(sticky = 'w', column=0, row=8)
 
     def resetGame(self):
         status = self.table.getStatus()
