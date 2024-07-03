@@ -102,8 +102,9 @@ class Table:
         if len(selectedCards) == 0:
             return False
         is_sequence = False
-        if len(selectedCards) >= 2: is_set = self.isSet(selectedCards)
-        if len(selectedCards) >= 3: is_sequence = self.isSequence(selectedCards)
+        if len(selectedCards) >= 2: 
+            is_set = self.isSet(selectedCards)
+            if len(selectedCards) >= 3: is_sequence = self.isSequence(selectedCards)
         if len(selectedCards) == 1 or is_set or is_sequence:
             self.discardDeck.addCardsToDeck(selectedCards)
             turnPlayer.removeCardsFromHand(selectedCards)
