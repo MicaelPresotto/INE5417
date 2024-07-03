@@ -9,7 +9,6 @@ from GUIImage import GUIImage
 from Player import Player
 from Card import Card
 from utils import NUMBER_OF_PLAYERS
-import random
 
 class PlayerInterface(DogPlayerInterface):
     def __init__(self):
@@ -34,12 +33,12 @@ class PlayerInterface(DogPlayerInterface):
 
     def receive_start(self, start_status):
         self.table.resetGame()
-        code = int(start_status.code)
+        code = int(start_status.get_code())
         if code == 0 or code == 1:
-            messagebox.showinfo("Problema", start_status.message)
+            messagebox.showinfo("Problema", start_status.get_message())
             return
-        messagebox.showinfo("Start", start_status.message)
-        self.table.setLocalPlayerId(start_status.local_id)
+        messagebox.showinfo("Start", start_status.get_message())
+        self.table.setLocalPlayerId(start_status.get_local_id())
 
     def createWidgets(self):
         self.buyLabel = tk.Label( self.mainWindow, text="Buy deck", bg="darkgreen", font=("Arial", 15), fg="white")
