@@ -52,3 +52,5 @@ Este é um jogo de cartas **Yaniv** implementado em Python 3. Yaniv é um jogo e
 python3 main.py
 ```
 5. Coloque seu nome e o jogo irá conectar-se automaticamente com a outra pessoa que também executou o programa. Bom jogo!
+
+OBS: Para alterar a quantidade de jogadores, será necessário alterar a constante NUMBER_OF_PLAYERS no arquivo utils.py
