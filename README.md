@@ -16,7 +16,7 @@ Este é um jogo de cartas **Yaniv** implementado em Python 3. Yaniv é um jogo e
    - Cartas numéricas (2-10): Valem seus respectivos valores.
    - Ás: Vale 1 ponto.
    - Valete, Dama e Rei: Valem 11, 12 e 13 pontos, respectivamente.
-   - Jokers (se usados): Tem valor 0.
+   - Jokers: Tem valor 0.
 
 4. **Rodadas**:
    - Cada jogador começa com cinco cartas.
