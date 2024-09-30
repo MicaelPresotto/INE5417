@@ -45,9 +45,10 @@ Este é um jogo de cartas **Yaniv** implementado em Python 3. Yaniv é um jogo e
 2. O jogo tem suporte para jogar de forma online, ou seja, é possível jogar com outra pessoa que também clonou o repositório.
 3. Por início após clonar o repositório execute:
   ```bash
-  pip install -r requirements.txt  
-4. Para executar o programa, basta entrar na pasta src/ e executar
-```bash
   pip install -r requirements.txt
+``` 
+4. Para executar o programa, basta entrar na pasta src/ e executar:
+```bash
    python3 main.py
+```
 5. Coloque seu nome e o jogo irá conectar-se automaticamente com a outra pessoa que também executou o programa. Bom jogo!
