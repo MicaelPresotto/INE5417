@@ -4,7 +4,7 @@
 
 # Yaniv
 
-Este é um jogo de cartas **Yaniv** implementado em Python 3. Yaniv é um jogo estratégico, rápido e fácil de aprender, muito popular em Israel e em outros países. É jogado com um baralho padrão, geralmente por 2 a 6 jogadores, onde o objetivo é reduzir o valor das cartas na sua mão para ser o primeiro a declarar "Yaniv", ou tentar superar quem declarou com "Assaf".
+Este é um jogo de cartas **Yaniv** implementado em Python 3. Yaniv é um jogo estratégico, rápido e fácil de aprender, muito popular em Israel e em outros países. É jogado com um baralho padrão, geralmente por 2 a 4 jogadores, onde o objetivo é reduzir o valor das cartas na sua mão para ser o primeiro a declarar "Yaniv".
 
 ## Regras Gerais
 
