@@ -49,6 +49,6 @@ Este é um jogo de cartas **Yaniv** implementado em Python 3. Yaniv é um jogo e
 ``` 
 4. Para executar o programa, basta entrar na pasta src/ e executar:
 ```bash
-   python3 main.py
+python3 main.py
 ```
 5. Coloque seu nome e o jogo irá conectar-se automaticamente com a outra pessoa que também executou o programa. Bom jogo!
